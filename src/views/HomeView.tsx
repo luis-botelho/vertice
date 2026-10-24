@@ -343,7 +343,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </section>
 
       {/* How It Works (B2B Process) */}
-      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="como-funciona" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs font-bold text-[#005cba] uppercase tracking-wider">Como Funciona a Representação</span>
           <h2 className="text-3xl font-display font-extrabold text-[#00162c] mt-1">Transparência Total da Indústria ao Seu Estoque</h2>

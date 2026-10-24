@@ -71,7 +71,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             Sobre a Vértice
           </button>
           <button
-            onClick={() => onNavigate('about')}
+            onClick={() => {
+              onNavigate('home');
+              setTimeout(() => {
+                const el = document.getElementById('como-funciona');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }, 100);
+            }}
             className="px-3 py-1.5 rounded text-sm font-medium text-[#43474d] hover:text-[#00162c] hover:bg-[#eff4ff] transition-colors"
           >
             Como Funciona
