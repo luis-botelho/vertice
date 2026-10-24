@@ -85,8 +85,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right Action Zone */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <div className="hidden xl:flex items-center gap-1.5 text-xs text-[#43474d] bg-[#eff4ff] px-2.5 py-1.5 rounded">
-            <span className="material-symbols-outlined text-[#005cba] text-[16px]">support_agent</span>
-            <span className="font-medium">(24) Atendimento Costa Verde & Região</span>
+            <span className="material-symbols-outlined text-[#005cba] text-[16px]">storefront</span>
+            <span className="font-medium">Atendimento comercial na Costa Verde</span>
           </div>
 
           {/* Quotation List Button */}
