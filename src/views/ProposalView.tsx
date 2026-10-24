@@ -89,11 +89,15 @@ export const ProposalView: React.FC<ProposalViewProps> = ({
   };
 
   const handleDownloadPDF = () => {
-    setFeedbackNotice('Gerando Proposta_Comercial_0001_2025_Vertice.pdf...');
-    setTimeout(() => {
-      setFeedbackNotice('Documento PDF exportado com sucesso!');
+    setFeedbackNotice('Gerando PDF da proposta...');
+    try {
+      window.print();
+      setFeedbackNotice('Janela de impressão aberta. Selecione "Salvar como PDF".');
+      setTimeout(() => setFeedbackNotice(null), 4000);
+    } catch (err) {
+      setFeedbackNotice('Não foi possível gerar o PDF.');
       setTimeout(() => setFeedbackNotice(null), 3000);
-    }, 1200);
+    }
   };
 
   return (
