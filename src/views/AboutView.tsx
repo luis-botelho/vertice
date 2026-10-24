@@ -13,13 +13,13 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigate }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <span className="text-xs uppercase font-bold text-[#a0caff] tracking-widest block mb-2">
-              Institucional Vértice Representações
+              Institucional Vértice Comercial
             </span>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold tracking-tight">
-              A Ponte Comercial de Confiança na Costa Verde Fluminense
+              Conectando marcas e mercados
             </h1>
             <p className="text-sm sm:text-base text-white/80 mt-4 leading-relaxed">
-              Atuamos como o braço comercial estratégico das principais indústrias nacionais de materiais de construção, levando tabelas direto de fábrica, apoio tributário e regularidade logística para revendas e depósitos em Angra dos Reis, Paraty e Mangaratiba.
+              A Vértice conecta lojas e revendas de materiais de construção a oportunidades de fornecimento. Apresentamos sua necessidade, consultamos alternativas e preparamos propostas comerciais personalizadas conforme quantidade, disponibilidade, destino e condições de fornecimento.
             </p>
           </div>
         </div>

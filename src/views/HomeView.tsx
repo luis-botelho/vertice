@@ -27,15 +27,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="lg:col-span-7 flex flex-col gap-6">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#e5eeff] text-[#00162c] text-xs font-semibold w-fit border border-[#d2e2ff]">
                 <span className="w-2 h-2 rounded-full bg-[#005cba] animate-pulse"></span>
-                <span>Atendimento Regional Exclusivo Costa Verde - RJ</span>
+                <span>Conectando marcas e mercados</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-[#00162c] leading-[1.12]">
-                O Elo Estratégico Entre as Melhores Fábricas e o Seu Depósito
+                Sua loja precisa. <span className="text-[#005cba]">A Vértice encontra o caminho.</span>
               </h1>
 
               <p className="text-lg text-[#43474d] leading-relaxed max-w-2xl">
-                Representação comercial técnica com faturamento direto da indústria, tabelas diferenciadas e suporte logístico dedicado para depósitos e revendas em <strong className="text-[#00162c] font-semibold">Angra dos Reis, Paraty e Mangaratiba</strong>.
+                Encontramos soluções de fornecimento para lojas e revendas de materiais de construção. Apresente sua necessidade, consulte nosso catálogo e solicite uma proposta comercial personalizada conforme quantidade, disponibilidade, destino e condições de fornecimento.
               </p>
 
               {/* CTAs */}
@@ -52,23 +52,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   className="px-6 py-3.5 rounded border border-[#00162c] text-[#00162c] hover:bg-[#e5eeff] transition-colors font-semibold text-sm flex items-center gap-2 cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[18px]">inventory_2</span>
-                  <span>Explorar Catálogo Técnico</span>
+                  <span>Explorar Catálogo</span>
                 </button>
               </div>
 
-              {/* Logistics Indicators */}
-              <div className="grid grid-cols-3 gap-4 pt-6 border-t border-[#dce9ff]/80">
+              {/* Value Points */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-[#dce9ff]/80">
                 <div className="flex flex-col">
-                  <span className="text-2xl font-bold font-display text-[#00162c]">3 Regiões</span>
-                  <span className="text-xs text-[#43474d] leading-tight mt-0.5">Rotas semanais fixas</span>
+                  <span className="text-base font-semibold font-display text-[#00162c]">Pesquisa de alternativas</span>
+                  <span className="text-xs text-[#43474d] leading-tight mt-0.5">Buscamos condições viáveis</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-2xl font-bold font-display text-[#005cba]">R$ 0 Frete</span>
-                  <span className="text-xs text-[#43474d] leading-tight mt-0.5">Condições CIF programadas</span>
+                  <span className="text-base font-semibold font-display text-[#00162c]">Proposta sob consulta</span>
+                  <span className="text-xs text-[#43474d] leading-tight mt-0.5">Personalizada à demanda</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-2xl font-bold font-display text-[#00162c]">≤ 24h SLA</span>
-                  <span className="text-xs text-[#43474d] leading-tight mt-0.5">Retorno com margem líquida</span>
+                  <span className="text-base font-semibold font-display text-[#00162c]">Foco em B2B</span>
+                  <span className="text-xs text-[#43474d] leading-tight mt-0.5">Depósitos e revendas</span>
                 </div>
               </div>
             </div>
@@ -345,10 +345,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* How It Works (B2B Process) */}
       <section id="como-funciona" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-xs font-bold text-[#005cba] uppercase tracking-wider">Como Funciona a Representação</span>
-          <h2 className="text-3xl font-display font-extrabold text-[#00162c] mt-1">Transparência Total da Indústria ao Seu Estoque</h2>
+          <span className="text-xs font-bold text-[#005cba] uppercase tracking-wider">Como Funciona</span>
+          <h2 className="text-3xl font-display font-extrabold text-[#00162c] mt-1">Cotação sob demanda</h2>
           <p className="text-sm text-[#43474d] mt-2">
-            Eliminamos intermediários e custos desnecessários com faturamento direto da fábrica com alíquotas industriais e logística planejada.
+            Avaliamos condições de fornecimento conforme sua demanda, sem prometer estoque garantido.
           </p>
         </div>
 
@@ -359,14 +359,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="w-12 h-12 rounded-lg bg-[#e5eeff] text-[#005cba] font-display font-bold text-xl flex items-center justify-center mb-4">
                 01
               </div>
-              <h3 className="font-display font-bold text-lg text-[#00162c]">Seleção & Envio de Cotação</h3>
+              <h3 className="font-display font-bold text-lg text-[#00162c]">Informe sua necessidade</h3>
               <p className="text-xs text-[#43474d] mt-2 leading-relaxed">
-                Você escolhe os produtos, define volumes por caixas master e informa os dados cadastrais da sua empresa (CNPJ e IE).
+                Selecione produtos no catálogo ou envie sua lista com quantidades e requisitos comerciais.
               </p>
             </div>
             <div className="mt-6 pt-4 border-t border-[#f0f4fc] text-xs text-[#005cba] font-medium flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[16px]">touch_app</span>
-              <span>Processo 100% digital e ágil</span>
+              <span>Processo 100% digital</span>
             </div>
           </div>
 
@@ -376,14 +376,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="w-12 h-12 rounded-lg bg-[#00162c] text-white font-display font-bold text-xl flex items-center justify-center mb-4">
                 02
               </div>
-              <h3 className="font-display font-bold text-lg text-[#00162c]">Análise & Condições Faturadas</h3>
+              <h3 className="font-display font-bold text-lg text-[#00162c]">Análise das condições</h3>
               <p className="text-xs text-[#43474d] mt-2 leading-relaxed">
-                Nossa equipe comercial avalia os descontos por escalonamento de volume, tributação ICMS-ST / IPI para o Rio de Janeiro e prazos de pagamento.
+                Avaliamos disponibilidade, custos e logística para a sua demanda.
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t border-[#f0f4fc] text-xs text-[#005cba] font-medium flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[16px]">schedule</span>
-              <span>Retorno formal em menos de 24h</span>
+            <div className="mt-6 pt-4 border-t border-[#f0f4fc] text-xs text-[#43474d] font-medium flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[16px]">fact_check</span>
+              <span>Proposta personalizada</span>
             </div>
           </div>
 
@@ -393,14 +393,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="w-12 h-12 rounded-lg bg-[#e5eeff] text-[#005cba] font-display font-bold text-xl flex items-center justify-center mb-4">
                 03
               </div>
-              <h3 className="font-display font-bold text-lg text-[#00162c]">Faturamento Direto & Entrega</h3>
+              <h3 className="font-display font-bold text-lg text-[#00162c]">Receba sua proposta</h3>
               <p className="text-xs text-[#43474d] mt-2 leading-relaxed">
-                Após sua aprovação, o pedido entra diretamente na linha de expedição da fábrica com nota fiscal de origem e frete CIF no pátio do seu depósito.
+                Você recebe a proposta comercial para avaliar. Não há pedido confirmado pelo site.
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t border-[#f0f4fc] text-xs text-[#005cba] font-medium flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[16px]">local_shipping</span>
-              <span>Descarga segura em Angra, Paraty e Mangaratiba</span>
+            <div className="mt-6 pt-4 border-t border-[#f0f4fc] text-xs text-[#43474d] font-medium flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[16px]">description</span>
+              <span>Sujeita à análise</span>
             </div>
           </div>
         </div>
@@ -411,12 +411,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-6 flex flex-col gap-6">
-              <span className="text-xs font-bold text-[#a0caff] uppercase tracking-wider">Autoridade Regional</span>
+              <span className="text-xs font-bold text-[#a0caff] uppercase tracking-wider">Atuação comercial</span>
               <h2 className="text-3xl sm:text-4xl font-display font-extrabold tracking-tight leading-tight">
-                Por que os principais lojistas da Costa Verde confiam na Vértice
+                Foco em lojas e revendas de materiais de construção
               </h2>
               <p className="text-sm text-white/80 leading-relaxed">
-                Atuar na Costa Verde exige conhecimento específico da malha rodoviária (Rio-Santos BR-101), horários de descarga nas zonas urbanas e litorâneas, e a alta exigência contra maresia em instalações elétricas e hidráulicas.
+                A Vértice conecta estabelecimentos comerciais a oportunidades de fornecimento, avaliando cada demanda para buscar condições viáveis conforme quantidade, destino e necessidades do cliente.
               </p>
 
               <div className="space-y-4 pt-2">
