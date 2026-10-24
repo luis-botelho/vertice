@@ -1,0 +1,357 @@
+import { Product } from '../types';
+
+export const PRODUCTS: Product[] = [
+  {
+    id: 'ver-hid-2041',
+    sku: 'VER-HID-2041',
+    name: 'Kit Válvula de Descarga e Mecanismo para Caixa Acoplada Universal',
+    category: 'Hidráulica & Conexões',
+    manufacturer: 'Censi Mecanismos',
+    application: 'Residencial & Comercial Leve',
+    material: 'Polímero / Borracha',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAHD8h1S25R_Mi3ivT4QmIiB7wy-ahTDE2jBpAa8RK4-JFFfC-ZaGs4gK49jppVeqyQwc2fadF5cYnkpSA7JyGJsik6WVeoo8t4ni2WLpYBS8vbSva3r48rsZvQhxLqBgAIBZmy8jensoKoEUUXKNgSRtdtWo6Hk4oXIdBvt9u60vL1EoMxfMmFBDNWGriuEX28RhwvTsZic0KPB0byWH-_3n7NjkrB8VL3iq9NVMu-sXhtDbzWbPbW5Q',
+    gallery: [
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuAHD8h1S25R_Mi3ivT4QmIiB7wy-ahTDE2jBpAa8RK4-JFFfC-ZaGs4gK49jppVeqyQwc2fadF5cYnkpSA7JyGJsik6WVeoo8t4ni2WLpYBS8vbSva3r48rsZvQhxLqBgAIBZmy8jensoKoEUUXKNgSRtdtWo6Hk4oXIdBvt9u60vL1EoMxfMmFBDNWGriuEX28RhwvTsZic0KPB0byWH-_3n7NjkrB8VL3iq9NVMu-sXhtDbzWbPbW5Q',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuBXhTUjObmR8fIaKivXRY4RuerQeEv2bWdsYljpaHYL8zixTxpUwhcz43rf9FDZbx1MpGExCGc53KaJhdkayX9xttChi2PK3Y0g9ws073WbJ6bc0NdIyyygfU8oGUxWtSBY1-GUKPwJyC360MHP2cNee-zh9neS7Frzl5ytxw4-rS8vAYQ2vXctMAttQ235x5DgbdGNuu70nXcFD3d5myu2h3A9ULBZkeJkY5kn2epBIQoSVf0hacMoCA'
+    ],
+    description: 'Mecanismo hidráulico completo com duplo acionamento economizador (3L / 6L) que proporciona até 50% de economia de água potável. Produzido com vedação em silicone virgem indeformável de alta performance e altura ajustável com compatibilidade universal para todas as louças sanitárias nacionais de 2" e 2.1/2".',
+    features: [
+      'Duplo Acionamento 3/6 Litros (economia hídrica comprovada)',
+      'Ajuste Telescópico micrométrico da torre de 210mm a 330mm de altura',
+      'Universalidade compatível com Deca, Incepa, Celite, Roca, Icasa',
+      'Resistente à maresia e salinidade típica da Costa Verde'
+    ],
+    unit: 'caixas master',
+    packageMaster: 'Emb. Master: 12 un',
+    packageMasterUnits: 12,
+    minOrderQuantity: 12,
+    tablePrice: 38.50,
+    standardDiscountPercent: 8.5,
+    badgeHighlight: 'Pronta Entrega RJ',
+    ncm: '8481.80.19',
+    warranty: 'Garantia Fabril: 5 Anos',
+    refFab: 'MDU-DUO-PRO',
+    technicalSpecs: [
+      { parameter: 'Pressão Hidrostática de Trabalho', value: '1 a 100 m.c.a (0,1 a 10 kgf/cm² / 10 a 1000 kPa)', standard: 'Opera com perfeita vedação tanto em baixa quanto alta pressão predial' },
+      { parameter: 'Composição da Torre e Engrenagens', value: 'Plásticos de Engenharia (POM / Poliacetal + ABS Virgem)', standard: 'Anti-incrustante, imune à corrosão salina típica da orla marítima' },
+      { parameter: 'Membrana e Obturador de Vedação', value: 'Silicone Virgem Vulcanizado com memória elástica', standard: 'Sem dilatação ou ressecamento por agentes clorados da rede pública' },
+      { parameter: 'Norma Técnica Brasileira (ABNT)', value: 'NBR 15491:2010', standard: 'Aprovado em ensaio de estanqueidade e durabilidade de 200.000 ciclos' },
+      { parameter: 'Faixa de Ajuste da Altura da Torre', value: '210 mm a 330 mm (Passo micrométrico com trava)', standard: 'Adequação exata ao volume interno de caixas acopladas baixas e altas' },
+      { parameter: 'Acionador Superior', value: 'Cromagem galvânica multicamada anti-descascamento', standard: 'Furo de louça: Ø 38mm a 44mm (Acompanha anel de compensação)' }
+    ],
+    logisticSpecs: {
+      coletiva: '12 un. / Caixa Master',
+      liquidWeight: '480g (Kit completo)',
+      ean13: '7898512490214',
+      dun14: '17898512490211',
+      paletizacao: 'Paletização: 48 cxs'
+    }
+  },
+  {
+    id: 'ver-met-1082',
+    sku: 'VER-MET-1082',
+    name: 'Torneira Monocomando Bica Alta Cromada para Bancada Gourmet',
+    category: 'Metais & Torneiras',
+    manufacturer: 'Deca Louças & Metais',
+    application: 'Residencial & Comercial Leve',
+    material: 'Latão Cromado',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBXhTUjObmR8fIaKivXRY4RuerQeEv2bWdsYljpaHYL8zixTxpUwhcz43rf9FDZbx1MpGExCGc53KaJhdkayX9xttChi2PK3Y0g9ws073WbJ6bc0NdIyyygfU8oGUxWtSBY1-GUKPwJyC360MHP2cNee-zh9neS7Frzl5ytxw4-rS8vAYQ2vXctMAttQ235x5DgbdGNuu70nXcFD3d5myu2h3A9ULBZkeJkY5kn2epBIQoSVf0hacMoCA',
+    gallery: [
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuBXhTUjObmR8fIaKivXRY4RuerQeEv2bWdsYljpaHYL8zixTxpUwhcz43rf9FDZbx1MpGExCGc53KaJhdkayX9xttChi2PK3Y0g9ws073WbJ6bc0NdIyyygfU8oGUxWtSBY1-GUKPwJyC360MHP2cNee-zh9neS7Frzl5ytxw4-rS8vAYQ2vXctMAttQ235x5DgbdGNuu70nXcFD3d5myu2h3A9ULBZkeJkY5kn2epBIQoSVf0hacMoCA'
+    ],
+    description: 'Torneira monocomando para lavatório ou cuba de apoio com cartucho cerâmico de 35mm e acabamento cromado triplo anti-corrosão especial para regiões litorâneas. Controle preciso de vazão e temperatura.',
+    features: [
+      'Cartucho cerâmico com teste de 500.000 acionamentos',
+      'Tripla camada de cromo com teste Salt Spray de 96 horas',
+      'Arejador embutido com economia de até 40% de vazão sem respingos',
+      'Instalação rápida com flexíveis de malha de aço inox inclusos'
+    ],
+    unit: 'unidades',
+    packageMaster: 'Emb. Master: 06 un',
+    packageMasterUnits: 6,
+    minOrderQuantity: 6,
+    tablePrice: 145.00,
+    standardDiscountPercent: 5.0,
+    badgeHighlight: 'Garantia 10 Anos',
+    ncm: '8481.80.11',
+    warranty: 'Garantia 10 Anos Deca',
+    refFab: 'TMC-BA-INOX',
+    technicalSpecs: [
+      { parameter: 'Pressão Mínima / Máxima', value: '2 a 40 m.c.a', standard: 'Conforme NBR 10281' },
+      { parameter: 'Material do Corpo', value: 'Liga de Cobre e Zinco (Latão Forjado Maciço)', standard: 'Alta densidade livre de porosidades' },
+      { parameter: 'Acabamento Superficial', value: 'Cromado Brilhante Níquel-Cromo', standard: 'Resistência anti-salitre da Costa Verde' }
+    ],
+    logisticSpecs: {
+      coletiva: '6 un. / Caixa Master',
+      liquidWeight: '1.250g / un',
+      ean13: '7891234098214',
+      dun14: '17891234098211',
+      paletizacao: 'Paletização: 36 cxs'
+    }
+  },
+  {
+    id: 'ver-tub-5012',
+    sku: 'VER-TUB-5012',
+    name: 'Tubo Soldável PVC Marrom 25mm (Vara 6m) - Fardo com 10 barras',
+    category: 'Hidráulica & Conexões',
+    manufacturer: 'Tigre Brasil',
+    application: 'Predial / Infraestrutura',
+    material: 'PVC / CPVC',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAHD8h1S25R_Mi3ivT4QmIiB7wy-ahTDE2jBpAa8RK4-JFFfC-ZaGs4gK49jppVeqyQwc2fadF5cYnkpSA7JyGJsik6WVeoo8t4ni2WLpYBS8vbSva3r48rsZvQhxLqBgAIBZmy8jensoKoEUUXKNgSRtdtWo6Hk4oXIdBvt9u60vL1EoMxfMmFBDNWGriuEX28RhwvTsZic0KPB0byWH-_3n7NjkrB8VL3iq9NVMu-sXhtDbzWbPbW5Q',
+    description: 'Norma Técnica NBR 5648; fardo com 10 barras de 6 metros cada, direto da unidade fabril para estoque de revenda. Indicado para condução de água potável em instalações prediais de água fria sob pressão.',
+    features: [
+      'Pressão de serviço PN 75 (7,5 kgf/cm²)',
+      'Excelente resistência química e mecânica sem incrustações',
+      'Leve e de fácil transporte e manuseio no depósito',
+      'Junta soldável a frio com adesivo plástico para PVC'
+    ],
+    unit: 'fardos (10 barras)',
+    packageMaster: 'Fardo: 10 barras (60m)',
+    packageMasterUnits: 1,
+    minOrderQuantity: 5,
+    tablePrice: 189.00,
+    standardDiscountPercent: 10.0,
+    badgeHighlight: 'Frete CIF Angra',
+    ncm: '3917.23.00',
+    warranty: 'Garantia Tigre',
+    refFab: 'TUB-SOL-25-6M',
+    technicalSpecs: [
+      { parameter: 'Diâmetro Nominal', value: 'DN 25 (3/4")', standard: 'NBR 5648' },
+      { parameter: 'Espessura de Parede', value: '1,5 mm', standard: 'Conforme norma regulamentar' },
+      { parameter: 'Comprimento', value: '6 metros úteis', standard: 'Tolerância ABNT' }
+    ],
+    logisticSpecs: {
+      coletiva: '10 barras amarradas / Fardo',
+      liquidWeight: '1.45 kg / barra',
+      ean13: '7891333002512',
+      dun14: '17891333002519',
+      paletizacao: 'Paletização: 50 fardos'
+    }
+  },
+  {
+    id: 'ver-reg-3044',
+    sku: 'VER-REG-3044',
+    name: 'Registro de Pressão 3/4" com Acabamento C-50 Cromado',
+    category: 'Metais & Torneiras',
+    manufacturer: 'Docol Metais',
+    application: 'Residencial & Comercial Leve',
+    material: 'Latão Cromado',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBXhTUjObmR8fIaKivXRY4RuerQeEv2bWdsYljpaHYL8zixTxpUwhcz43rf9FDZbx1MpGExCGc53KaJhdkayX9xttChi2PK3Y0g9ws073WbJ6bc0NdIyyygfU8oGUxWtSBY1-GUKPwJyC360MHP2cNee-zh9neS7Frzl5ytxw4-rS8vAYQ2vXctMAttQ235x5DgbdGNuu70nXcFD3d5myu2h3A9ULBZkeJkY5kn2epBIQoSVf0hacMoCA',
+    description: 'Corpo em liga de cobre (latão forjado), padrão 16 estrias Deca/Docol, alta estanqueidade sob pressão de coluna de água.',
+    features: [
+      'Estanqueidade absoluta em alta e baixa pressão',
+      'Haste com dupla vedação o-ring nitrílica',
+      'Acabamento clássico tipo cruzeta C-50 cromado de alta procura'
+    ],
+    unit: 'unidades',
+    packageMaster: 'Caixa Master: 24 un',
+    packageMasterUnits: 24,
+    minOrderQuantity: 12,
+    tablePrice: 54.90,
+    standardDiscountPercent: 7.0,
+    badgeHighlight: 'Norma ABNT',
+    ncm: '8481.80.95',
+    warranty: 'Garantia Toda Vida Docol',
+    refFab: 'REG-PRS-34-C50'
+  },
+  {
+    id: 'ver-ele-7019',
+    sku: 'VER-ELE-7019',
+    name: 'Cabo Flexível 2,5mm² 750V Antichama (Rolo 100m) Cobre Puro',
+    category: 'Elétrica & Iluminação',
+    manufacturer: 'Prysmian Condutores',
+    application: 'Predial / Infraestrutura',
+    material: 'Cobre Eletrolítico',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCsz8EWAizek--iH1J6A-JVNOLP5kHQWmubhW1goWaMvf-iauS9oy3r9m50nnYYGAwgU3vpJylcXB8_gcYvNR8ZoakmcZpbEDXl6G-x65koUBcVkTZvbOcvND1NymSskA20xhOzuuoUFmxP4Icyq9HtlXYgjDFhR9W7pbGycD-kvMT2mjgJc5krreDgd5enalcs3iOgMgFjEXkIwM64ZulJEQoaW12YzviZH01Aeo9Dgi7ww-KOL6SwFg',
+    description: 'Cobre eletrolítico 99,9% puro, isolamento em composto termoplástico PVC/A 70°C com certificação compulsória INMETRO e classe 5 de flexibilidade.',
+    features: [
+      'Condutor em cobre nu têmpera mole classe 5',
+      'Isolação em dupla camada antichama BWF-B',
+      'Deslizamento suave em eletrodutos e conduítes corrugados'
+    ],
+    unit: 'rolos 100m',
+    packageMaster: 'Rolo lacrado: 100m',
+    packageMasterUnits: 1,
+    minOrderQuantity: 4,
+    tablePrice: 215.00,
+    standardDiscountPercent: 6.5,
+    badgeHighlight: 'Selo INMETRO',
+    ncm: '8544.49.00',
+    warranty: 'Conformidade NBR NM 247-3',
+    refFab: 'PRY-CAB-25-100'
+  },
+  {
+    id: 'ver-ele-8820',
+    sku: 'VER-ELE-8820',
+    name: 'Disjuntor Bipolar Termomagnético DIN 32A Curva C Linha Resi9',
+    category: 'Elétrica & Iluminação',
+    manufacturer: 'Schneider Electric',
+    application: 'Residencial & Comercial Leve',
+    material: 'Polímero / Borracha',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCsz8EWAizek--iH1J6A-JVNOLP5kHQWmubhW1goWaMvf-iauS9oy3r9m50nnYYGAwgU3vpJylcXB8_gcYvNR8ZoakmcZpbEDXl6G-x65koUBcVkTZvbOcvND1NymSskA20xhOzuuoUFmxP4Icyq9HtlXYgjDFhR9W7pbGycD-kvMT2mjgJc5krreDgd5enalcs3iOgMgFjEXkIwM64ZulJEQoaW12YzviZH01Aeo9Dgi7ww-KOL6SwFg',
+    description: 'Capacidade de interrupção 3kA/4,5kA; fixação em trilho DIN 35mm conforme especificações IEC 60898 para proteção de circuitos de ar condicionado e chuveiros.',
+    features: [
+      'Disparo térmico contra sobrecarga e magnético contra curto-circuito',
+      'Janela de indicação de estado mecânico Verde/Vermelho',
+      'Bornes com proteção contra toque acidental IP20'
+    ],
+    unit: 'unidades',
+    packageMaster: 'Caixa Coletiva: 12 un',
+    packageMasterUnits: 12,
+    minOrderQuantity: 12,
+    tablePrice: 42.80,
+    standardDiscountPercent: 8.0,
+    badgeHighlight: 'Linha Resi9',
+    ncm: '8536.20.00',
+    warranty: 'Schneider Brasil',
+    refFab: 'SCH-DIS-2P32'
+  },
+  {
+    id: 'ver-hid-1193',
+    sku: 'VER-HID-1193',
+    name: 'Sifão Sanfonado Universal Branco com Adaptador Multiuso',
+    category: 'Hidráulica & Conexões',
+    manufacturer: 'Astra Industrial',
+    application: 'Residencial & Comercial Leve',
+    material: 'Polímero / Borracha',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAHD8h1S25R_Mi3ivT4QmIiB7wy-ahTDE2jBpAa8RK4-JFFfC-ZaGs4gK49jppVeqyQwc2fadF5cYnkpSA7JyGJsik6WVeoo8t4ni2WLpYBS8vbSva3r48rsZvQhxLqBgAIBZmy8jensoKoEUUXKNgSRtdtWo6Hk4oXIdBvt9u60vL1EoMxfMmFBDNWGriuEX28RhwvTsZic0KPB0byWH-_3n7NjkrB8VL3iq9NVMu-sXhtDbzWbPbW5Q',
+    description: 'Termoplástico virgem com memória mecânica, compatível com água fria e quente, entradas de 7/8" até 1.1/2" e saídas DN 38/40/48/50.',
+    features: [
+      'Fecho hídrico regulável anti-odor',
+      'Suporta água quente até 90°C',
+      'Garantia de vedação perfeita sem uso de ferramentas'
+    ],
+    unit: 'unidades',
+    packageMaster: 'Pacote: 30 un',
+    packageMasterUnits: 30,
+    minOrderQuantity: 15,
+    tablePrice: 11.20,
+    standardDiscountPercent: 12.0,
+    badgeHighlight: 'Saída DN 38/40/48/50',
+    ncm: '3917.40.90',
+    warranty: 'Astra 2 Anos',
+    refFab: 'SIF-UNIV-AST'
+  },
+  {
+    id: 'ver-fer-4402',
+    sku: 'VER-FER-4402',
+    name: 'Disco de Corte Fino Inox 4.1/2" x 1,0mm (Caixa c/ 25 unid.)',
+    category: 'Ferramentas & Acessórios',
+    manufacturer: 'Norton Abrasivos',
+    application: 'Industrial & Náutico',
+    material: 'Inox / Carbono',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD9VaPpyRoErUCavPXtM8P_6xPtxNsBAxk3DMJntirWsR91dhUFaXZSSN1n5pc2t6cqXDZOr_eTF2ixDx3_629S_IbfFkZgEQY7JhwR7MR3HRlo7YMVEtCbtTQHOSRwX7hivr8TwYNOXUHK0E8WF2JJjOQ9Dsss1kJeeegjvFuMy1GXq-UqNgWa-j0Txk7rpkSwxaUfB2YUpHZpTkjnkFhtxWY-Df9e_fGTYMc-pWAAJtCbY5bdlZOUEQ',
+    description: 'Dupla tela de reforço em fibra de vidro, corte a frio de alto rendimento sem queima ou rebarba para serralheria naval e montagem metálica.',
+    features: [
+      'Espessura ultra fina de 1,0mm para corte rápido',
+      'Livre de contaminantes de ferro, enxofre e cloro (Fe + S + Cl < 0,1%)',
+      'Ideal para manutenções em marinas e barcos de Angra dos Reis'
+    ],
+    unit: 'caixas c/ 25 discos',
+    packageMaster: 'Caixa: 25 discos',
+    packageMasterUnits: 1,
+    minOrderQuantity: 2,
+    tablePrice: 98.00,
+    standardDiscountPercent: 9.0,
+    badgeHighlight: 'Uso Inox e Aço Carbono',
+    ncm: '6804.22.11',
+    warranty: 'Norton Saint-Gobain',
+    refFab: 'DIS-NOR-45-INOX'
+  },
+  {
+    id: 'ver-hid-2035',
+    sku: 'VER-HID-2035',
+    name: 'Torre de Entrada Silenciosa Ultra Rápida para Caixa Acoplada',
+    category: 'Hidráulica & Conexões',
+    manufacturer: 'Censi Mecanismos',
+    application: 'Residencial & Comercial Leve',
+    material: 'Polímero / Borracha',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAHD8h1S25R_Mi3ivT4QmIiB7wy-ahTDE2jBpAa8RK4-JFFfC-ZaGs4gK49jppVeqyQwc2fadF5cYnkpSA7JyGJsik6WVeoo8t4ni2WLpYBS8vbSva3r48rsZvQhxLqBgAIBZmy8jensoKoEUUXKNgSRtdtWo6Hk4oXIdBvt9u60vL1EoMxfMmFBDNWGriuEX28RhwvTsZic0KPB0byWH-_3n7NjkrB8VL3iq9NVMu-sXhtDbzWbPbW5Q',
+    description: 'Enchimento super rápido mesmo com baixa pressão d\'água. Filtro em tela inox lavável acoplado que previne travamento por areia ou impurezas.',
+    features: [
+      'Opera de 1 a 100 m.c.a silenciosamente',
+      'Filtro incorporado removível para limpeza periódica',
+      'Ajuste simples de altura através de fuso regulador'
+    ],
+    unit: 'caixas coletivas',
+    packageMaster: 'Cx c/ 20 un',
+    packageMasterUnits: 20,
+    minOrderQuantity: 10,
+    tablePrice: 32.40,
+    standardDiscountPercent: 8.0,
+    badgeHighlight: 'Torre Entrada Silenciosa',
+    ncm: '8481.80.19',
+    warranty: 'Garantia 5 Anos',
+    refFab: 'TOR-ENT-SIL-CEN'
+  },
+  {
+    id: 'ver-met-1088',
+    sku: 'VER-MET-1088',
+    name: 'Registro de Esfera Angular 1/2" x 1/2" Cromado p/ Ponto de Água',
+    category: 'Metais & Torneiras',
+    manufacturer: 'Docol Metais',
+    application: 'Residencial & Comercial Leve',
+    material: 'Latão Cromado',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBXhTUjObmR8fIaKivXRY4RuerQeEv2bWdsYljpaHYL8zixTxpUwhcz43rf9FDZbx1MpGExCGc53KaJhdkayX9xttChi2PK3Y0g9ws073WbJ6bc0NdIyyygfU8oGUxWtSBY1-GUKPwJyC360MHP2cNee-zh9neS7Frzl5ytxw4-rS8vAYQ2vXctMAttQ235x5DgbdGNuu70nXcFD3d5myu2h3A9ULBZkeJkY5kn2epBIQoSVf0hacMoCA',
+    description: 'Corpo em latão forjado maciço com acionamento 1/4 de volta. Ideal para bloqueio local de ponto de água para torneiras, duchas e caixas acopladas.',
+    features: [
+      'Acionamento leve e suave em 1/4 de volta',
+      'Substitui conexões com economia de espaço na parede',
+      'Cromagem espelhada que combina com os metais do ambiente'
+    ],
+    unit: 'unidades',
+    packageMaster: 'Cx c/ 24 un',
+    packageMasterUnits: 24,
+    minOrderQuantity: 12,
+    tablePrice: 28.90,
+    standardDiscountPercent: 7.5,
+    badgeHighlight: 'Acabamento Cromado',
+    ncm: '8481.80.95',
+    warranty: 'Docol Toda Vida',
+    refFab: 'REG-ESF-ANG-12'
+  },
+  {
+    id: 'ver-hid-2049',
+    sku: 'VER-HID-2049',
+    name: 'Kit 3 Obturadores de Silicone de Reposição para Caixa Acoplada',
+    category: 'Hidráulica & Conexões',
+    manufacturer: 'Censi Mecanismos',
+    application: 'Residencial & Comercial Leve',
+    material: 'Polímero / Borracha',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAHD8h1S25R_Mi3ivT4QmIiB7wy-ahTDE2jBpAa8RK4-JFFfC-ZaGs4gK49jppVeqyQwc2fadF5cYnkpSA7JyGJsik6WVeoo8t4ni2WLpYBS8vbSva3r48rsZvQhxLqBgAIBZmy8jensoKoEUUXKNgSRtdtWo6Hk4oXIdBvt9u60vL1EoMxfMmFBDNWGriuEX28RhwvTsZic0KPB0byWH-_3n7NjkrB8VL3iq9NVMu-sXhtDbzWbPbW5Q',
+    description: 'Cartela de alta rotatividade para manutenção preventiva contra vazamento contínuo em bacias sanitárias. Silicone de grau nobre que não deforma.',
+    features: [
+      'Silicone especial virgem resistente a produtos químicos de limpeza',
+      'Corrente em aço inoxidável anti-ferrugem inclusa',
+      'Alta demanda de balcão para reparos residenciais imediatos'
+    ],
+    unit: 'cartelas c/ 3 un',
+    packageMaster: 'Cartela c/ 50 un',
+    packageMasterUnits: 50,
+    minOrderQuantity: 10,
+    tablePrice: 19.80,
+    standardDiscountPercent: 10.0,
+    badgeHighlight: 'Reposição Rápida',
+    ncm: '3926.90.90',
+    warranty: 'Garantia 1 Ano',
+    refFab: 'OBT-SIL-KIT3'
+  }
+];
+
+export const INITIAL_CART_ITEMS: { product: Product; quantity: number; notes?: string }[] = [
+  {
+    product: PRODUCTS[0], // VER-HID-2041 (Kit Válvula de Descarga)
+    quantity: 36,
+    notes: 'Preferência por embalagem blister com código EAN individual para gancheiras'
+  },
+  {
+    product: PRODUCTS[1], // VER-MET-1082 (Torneira Monocomando)
+    quantity: 12,
+    notes: 'Demanda para showroom de acabamentos e reposição de mostruário'
+  },
+  {
+    product: PRODUCTS[2], // VER-TUB-5012 (Tubo Soldável PVC 25mm 6m)
+    quantity: 5,
+    notes: 'Carga pesada para descarregamento no pátio interno da loja'
+  }
+];

@@ -1,0 +1,6 @@
+{
+  "name": "Vértice Representações Comerciais",
+  "description": "Portal B2B de representação comercial conectando fábricas industriais de materiais de construção, hidráulica, elétrica e acabamentos aos lojistas da Costa Verde - RJ.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
