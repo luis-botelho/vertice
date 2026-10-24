@@ -13,21 +13,21 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Brand info */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <span className="font-display text-2xl font-bold tracking-tight text-white">VÉRTICE</span>
+              <span className="font-display text-2xl font-bold tracking-tight text-white">VÉRTICE COMERCIAL</span>
             </div>
             <p className="text-sm text-[#b0c8eb] leading-relaxed">
-              Representação comercial institucional conectando fábricas líderes a revendas e distribuidores de materiais de construção, hidráulica, elétrica e acabamentos na Costa Verde - RJ.
+              Soluções de fornecimento B2B para lojas e revendas de materiais de construção. Conectamos demandas comerciais a alternativas de fornecimento, com cotações personalizadas conforme cada necessidade.
             </p>
             <div className="flex items-center gap-1.5 text-xs text-[#d7e3ff] mt-1 font-medium">
               <span className="material-symbols-outlined text-[16px] text-[#448ffd]">location_on</span>
-              <span>Angra dos Reis • Paraty • Mangaratiba</span>
+              <span>Atendimento comercial na Costa Verde</span>
             </div>
           </div>
 
           {/* Navegação Comercial */}
           <div className="flex flex-col gap-3">
             <span className="text-xs font-bold text-white uppercase tracking-wider">
-              Navegação Comercial
+              NAVEGAÇÃO COMERCIAL
             </span>
             <ul className="flex flex-col gap-2 text-sm text-[#b0c8eb]">
               <li>
@@ -43,15 +43,25 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   onClick={() => onNavigate('quotation-form')}
                   className="hover:text-white transition-colors cursor-pointer text-left"
                 >
-                  Solicitação de Cotação
+                  Solicitar Cotação
                 </button>
               </li>
               <li>
                 <button
-                  onClick={() => onNavigate('proposal')}
+                  onClick={() => {
+                    onNavigate('home');
+                    setTimeout(() => {
+                      const el = document.getElementById('como-funciona');
+                      if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      } else {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
+                    }, 100);
+                  }}
                   className="hover:text-white transition-colors cursor-pointer text-left"
                 >
-                  Espelho da Proposta Homologada
+                  Como Funciona
                 </button>
               </li>
               <li>
@@ -65,10 +75,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </ul>
           </div>
 
-          {/* Políticas & Atendimento */}
+          {/* Informações */}
           <div className="flex flex-col gap-3">
             <span className="text-xs font-bold text-white uppercase tracking-wider">
-              Políticas & Atendimento
+              INFORMAÇÕES
             </span>
             <ul className="flex flex-col gap-2 text-sm text-[#b0c8eb]">
               <li>
@@ -76,42 +86,35 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   onClick={() => onNavigate('contact')}
                   className="hover:text-white transition-colors cursor-pointer text-left"
                 >
-                  Central de Atendimento
+                  Contato
                 </button>
               </li>
-              <li>
-                <a
-                  href="https://wa.me/5524999814420"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-white transition-colors cursor-pointer text-left flex items-center gap-1"
-                >
-                  <span>Plantão WhatsApp Vendas</span>
-                </a>
+              <li className="text-xs text-[#7a93b3] pt-1">
+                Atendimento comercial focado em lojistas e revendas da região da Costa Verde.
               </li>
               <li className="text-xs text-[#7a93b3]">
-                Atendimento presencial em rotas semanais na região.
-              </li>
-              <li className="text-xs text-[#7a93b3]">
-                Faturamento direto fábrica mediante cadastro de CNPJ ativo.
+                Os dados enviados são utilizados exclusivamente para análise de fornecimento e elaboração da proposta comercial.
               </li>
             </ul>
           </div>
 
-          {/* Logística & Expedição */}
+          {/* Cotações & Fornecimento */}
           <div className="flex flex-col gap-3">
             <span className="text-xs font-bold text-white uppercase tracking-wider">
-              Logística & Expedição
+              COTAÇÕES E FORNECIMENTO
             </span>
             <p className="text-xs text-[#b0c8eb] leading-relaxed">
-              Cargas fechadas e fracionadas despachadas diretamente das linhas industriais com emissão de Danfe oficial e seguro de transporte.
+              A disponibilidade dos produtos, o preço, o frete e o prazo são avaliados conforme cada solicitação. As condições aplicáveis são informadas na proposta comercial.
             </p>
-            <div className="text-xs text-[#7a93b3] space-y-1 mt-1">
+            <div className="text-xs text-[#7a93b3] space-y-1.5 mt-1">
               <div className="flex items-center gap-1.5 text-white/90">
-                <span className="material-symbols-outlined text-[16px] text-[#448ffd]">local_shipping</span>
-                <span>Frete CIF programado Costa Verde</span>
+                <span className="material-symbols-outlined text-[16px] text-[#448ffd]">fact_check</span>
+                <span>Propostas comerciais sob medida</span>
               </div>
-              <div>Prazo médio de entrega: 4 a 6 dias úteis</div>
+              <div className="flex items-center gap-1.5 text-white/90">
+                <span className="material-symbols-outlined text-[16px] text-[#448ffd]">inventory_2</span>
+                <span>Catálogo como vitrine de produtos</span>
+              </div>
             </div>
           </div>
         </div>
@@ -119,10 +122,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         {/* Bottom Disclaimer Bar */}
         <div className="pt-6 border-t border-[#102b46] flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#7a93b3]">
           <p className="text-center md:text-left">
-            Atendimento exclusivo B2B para lojistas de materiais de construção, hidráulica, elétrica e acabamentos. Não comercializamos no varejo nem realizamos checkout online.
+            Atendimento exclusivo B2B para lojas e revendas de materiais de construção, hidráulica, elétrica e acabamentos. O envio de solicitação não constitui compra confirmada.
           </p>
           <div className="flex items-center gap-3 shrink-0 text-center md:text-right">
-            <span>© 2025 Vértice Representações. CNPJ 34.819.002/0001-90.</span>
+            <span>© 2026 Vértice Comercial. Todos os direitos reservados.</span>
             <button
               onClick={() => {
                 window.location.hash = '#/representante';
