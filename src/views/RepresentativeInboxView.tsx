@@ -108,48 +108,7 @@ export const RepresentativeInboxView: React.FC<RepresentativeInboxViewProps> = (
                   </div>
                 </div>
 
-                {/* Other mock tickets */}
-                <div
-                  onClick={() => setSelectedTicket('VTC-2025-0839')}
-                  className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                    selectedTicket === 'VTC-2025-0839'
-                      ? 'bg-[#eff4ff] border-[#005cba]'
-                      : 'bg-white border-[#e5eeff] hover:bg-[#f8f9ff]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-mono font-bold text-[#43474d]">#VTC-2025-0839</span>
-                    <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded">
-                      Aguardando NFe
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-xs text-[#00162c]">Madeireira & Materiais Paraty Ltda</h3>
-                  <div className="flex items-center justify-between text-[11px] text-[#43474d] mt-2">
-                    <span>Paraty - RJ</span>
-                    <strong className="text-[#00162c]">R$ 14.820,00</strong>
-                  </div>
-                </div>
-
-                <div
-                  onClick={() => setSelectedTicket('VTC-2025-0835')}
-                  className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                    selectedTicket === 'VTC-2025-0835'
-                      ? 'bg-[#eff4ff] border-[#005cba]'
-                      : 'bg-white border-[#e5eeff] hover:bg-[#f8f9ff]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-mono font-bold text-[#43474d]">#VTC-2025-0835</span>
-                    <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">
-                      Faturado Fábrica
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-xs text-[#00162c]">Comércio de Ferragens Muriqui ME</h3>
-                  <div className="flex items-center justify-between text-[11px] text-[#43474d] mt-2">
-                    <span>Mangaratiba - RJ</span>
-                    <strong className="text-[#00162c]">R$ 6.450,00</strong>
-                  </div>
-                </div>
+                {/* Other tickets - kept structure but without hardcoded demo values */}
               </div>
             </div>
 

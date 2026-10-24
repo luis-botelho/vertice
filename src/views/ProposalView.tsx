@@ -15,68 +15,24 @@ export const ProposalView: React.FC<ProposalViewProps> = ({
   const [isApproved, setIsApproved] = useState(false);
   const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null);
 
-  // Default fallback items to ensure the exact matching figures from the user's mockup (R$ 3.966,28) if cart is empty or custom
-  const displayItems =
-    cartItems.length > 0
-      ? cartItems.map((item, idx) => {
-          const discountPct = item.product.standardDiscountPercent || 8.5;
-          const unitNet = item.product.tablePrice * (1 - discountPct / 100);
-          const totalNet = unitNet * item.quantity;
-          return {
-            seq: String(idx + 1).padStart(2, '0'),
-            sku: item.product.sku,
-            description: item.product.name,
-            manufacturer: item.product.manufacturer,
-            ncm: item.product.ncm || '8481.80.99',
-            unit: item.product.unit,
-            quantity: item.quantity,
-            tablePrice: item.product.tablePrice,
-            discount: discountPct,
-            netPrice: unitNet,
-            totalNet: totalNet,
-          };
-        })
-      : [
-          {
-            seq: '01',
-            sku: 'HYD-VLV-4490',
-            description: 'Kit Válvula de Descarga Universal Completa com Acabamento Cromado',
-            manufacturer: 'CENSI',
-            ncm: '8481.80.19',
-            unit: 'un',
-            quantity: 12,
-            tablePrice: 138.5,
-            discount: 8.5,
-            netPrice: 126.73,
-            totalNet: 1520.73,
-          },
-          {
-            seq: '02',
-            sku: 'MET-TOR-8821',
-            description: 'Torneira Monocomando de Bancada para Cozinha Bica Alta Tube Cromada',
-            manufacturer: 'DECA',
-            ncm: '8481.80.19',
-            unit: 'un',
-            quantity: 6,
-            tablePrice: 265.0,
-            discount: 5.0,
-            netPrice: 251.75,
-            totalNet: 1510.5,
-          },
-          {
-            seq: '03',
-            sku: 'HYD-TUB-100E',
-            description: 'Tubo PVC Esgoto Série Normal 100mm Barra 6m',
-            manufacturer: 'TIGRE',
-            ncm: '3917.23.00',
-            unit: 'barra',
-            quantity: 20,
-            tablePrice: 52.0,
-            discount: 10.0,
-            netPrice: 46.8,
-            totalNet: 936.0,
-          },
-        ];
+  const displayItems = cartItems.map((item, idx) => {
+    const discountPct = item.product.standardDiscountPercent || 8.5;
+    const unitNet = item.product.tablePrice * (1 - discountPct / 100);
+    const totalNet = unitNet * item.quantity;
+    return {
+      seq: String(idx + 1).padStart(2, '0'),
+      sku: item.product.sku,
+      description: item.product.name,
+      manufacturer: item.product.manufacturer,
+      ncm: item.product.ncm || '8481.80.99',
+      unit: item.product.unit,
+      quantity: item.quantity,
+      tablePrice: item.product.tablePrice,
+      discount: discountPct,
+      netPrice: unitNet,
+      totalNet: totalNet,
+    };
+  });
 
   const totalTableSum = displayItems.reduce((acc, it) => acc + it.tablePrice * it.quantity, 0);
   const totalNetSum = displayItems.reduce((acc, it) => acc + it.totalNet, 0);

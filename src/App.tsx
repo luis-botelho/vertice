@@ -14,6 +14,7 @@ import { RepresentativeLoginView } from './views/RepresentativeLoginView';
 import { RepresentativeDashboardView } from './views/RepresentativeDashboardView';
 import { AboutView } from './views/AboutView';
 import { ContactView } from './views/ContactView';
+import { apiRequest, AUTH_TOKEN_KEY } from './lib/api';
 
 const STORAGE_KEY_PRODUCTS = 'vertice_products_catalog';
 const STORAGE_KEY_AUTH = 'vertice_rep_auth';
@@ -48,34 +49,20 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState<Product>(products[0] || PRODUCTS[0]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Pre-seeded with items matching the standard quotation figures (R$ 3.966,28)
-  const [cartItems, setCartItems] = useState<QuoteItem[]>([
-    {
-      product: PRODUCTS[0], // Censi Kit Válvula
-      quantity: 12,
-    },
-    {
-      product: PRODUCTS[1], // Deca Torneira Monocomando
-      quantity: 6,
-    },
-    {
-      product: PRODUCTS[2], // Tigre Tubo Esgoto 100mm
-      quantity: 20,
-    },
-  ]);
+  const [cartItems, setCartItems] = useState<QuoteItem[]>([]);
 
   const [customerData, setCustomerData] = useState<CustomerData>({
-    razaoSocial: 'Depósito do Construtor Costa Verde Ltda',
-    cnpj: '28.940.112/0001-44',
-    inscricaoEstadual: '87.420.910',
-    compradorNome: 'Carlos Eduardo Silveira',
-    whatsapp: '(24) 99842-1100',
-    email: 'compras@depositocostaverde.com.br',
-    cidade: 'Angra dos Reis',
-    endereco: 'Rod. Rio-Santos BR-101 Km 482 - Galpão 03',
-    prazoCompra: '28/42/56 DDL Faturado Fábrica',
-    modalidadeFrete: 'CIF - Entrega Gratuita Costa Verde (Vértice)',
-    observacoes: 'Recebimento de carretas até as 17h; possui empilhadeira para descarga de paletes.',
+    razaoSocial: '',
+    cnpj: '',
+    inscricaoEstadual: '',
+    compradorNome: '',
+    whatsapp: '',
+    email: '',
+    cidade: '',
+    endereco: '',
+    prazoCompra: '',
+    modalidadeFrete: '',
+    observacoes: '',
   });
 
   // Handle URL hash routing (e.g. #/representante or #/admin)
@@ -131,6 +118,7 @@ export default function App() {
     setIsRepAuthenticated(false);
     try {
       sessionStorage.removeItem(STORAGE_KEY_AUTH);
+      sessionStorage.removeItem(AUTH_TOKEN_KEY);
     } catch (e) {
       console.warn(e);
     }
@@ -180,7 +168,20 @@ export default function App() {
     setCartItems([]);
   };
 
-  const handleSubmitQuotation = () => {
+  const handleSubmitQuotation = async () => {
+    await apiRequest('/quotations', {
+      method: 'POST',
+      body: JSON.stringify({
+        customer: customerData,
+        items: cartItems.map(({product, quantity, notes}) => ({
+          productId: product.id,
+          productName: product.name,
+          sku: product.sku,
+          quantity,
+          notes,
+        })),
+      }),
+    });
     setCurrentView('quotation-success');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
