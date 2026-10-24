@@ -107,14 +107,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>
-            <span className="text-xs font-bold text-[#005cba] uppercase tracking-wider">Portfólio de Marcas Representadas</span>
-            <h2 className="text-3xl font-display font-extrabold text-[#00162c] mt-1">Linhas Industriais em Destaque</h2>
+            <span className="text-xs font-bold text-[#005cba] uppercase tracking-wider">Categorias em Catálogo</span>
+            <h2 className="text-3xl font-display font-extrabold text-[#00162c] mt-1">Linhas de Produtos em Destaque</h2>
           </div>
           <button
             onClick={() => onNavigate('catalog')}
             className="text-sm font-semibold text-[#005cba] hover:text-[#00162c] flex items-center gap-1 cursor-pointer"
           >
-            Ver todas as 4 divisões
+            Ver todas as divisões
             <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
           </button>
         </div>
@@ -132,7 +132,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <span className="absolute top-3 left-3 bg-[#00162c]/80 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded">
-                Tigre • Censi • Docol
+                Tubos & Conexões
               </span>
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between">
@@ -145,7 +145,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </p>
               </div>
               <div className="mt-4 pt-3 border-t border-[#f0f4fc] flex items-center justify-between text-xs font-semibold text-[#005cba]">
-                <span>Tabelas de atacado</span>
+                <span>Consultar itens</span>
                 <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">east</span>
               </div>
             </div>
@@ -163,7 +163,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <span className="absolute top-3 left-3 bg-[#00162c]/80 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded">
-                Deca • Docol
+                Metais & Registros
               </span>
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between">
@@ -172,11 +172,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   Metais & Torneiras
                 </h3>
                 <p className="text-xs text-[#43474d] mt-1.5 leading-relaxed">
-                  Misturadores, torneiras com sensor, chuveiros de alto padrão e acabamentos com garantia estendida.
+                  Misturadores, torneiras com sensor, chuveiros e acabamentos para revenda e obras.
                 </p>
               </div>
               <div className="mt-4 pt-3 border-t border-[#f0f4fc] flex items-center justify-between text-xs font-semibold text-[#005cba]">
-                <span>Garantia de 10 anos</span>
+                <span>Consultar itens</span>
                 <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">east</span>
               </div>
             </div>
@@ -194,7 +194,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <span className="absolute top-3 left-3 bg-[#00162c]/80 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded">
-                Prysmian • Schneider
+                Condutores & Painéis
               </span>
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between">
@@ -203,11 +203,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   Elétrica & Iluminação
                 </h3>
                 <p className="text-xs text-[#43474d] mt-1.5 leading-relaxed">
-                  Condutores de cobre puro, disjuntores DIN, quadros de distribuição e condutores para marina.
+                  Condutores de cobre, disjuntores DIN, quadros de distribuição e condutores para diferentes aplicações.
                 </p>
               </div>
               <div className="mt-4 pt-3 border-t border-[#f0f4fc] flex items-center justify-between text-xs font-semibold text-[#005cba]">
-                <span>Norma NBR 5410</span>
+                <span>Consultar itens</span>
                 <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">east</span>
               </div>
             </div>
@@ -225,7 +225,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <span className="absolute top-3 left-3 bg-[#00162c]/80 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded">
-                Astra • Norton
+                Acessórios & Fixação
               </span>
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between">
@@ -234,11 +234,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   Ferramentas & Acessórios
                 </h3>
                 <p className="text-xs text-[#43474d] mt-1.5 leading-relaxed">
-                  Abrasivos, discos de corte, fitas veda rosca técnicas, selantes PU náuticos e EPIs regulamentares.
+                  Abrasivos, discos de corte, fitas veda rosca, selantes PU náuticos e itens de fixação.
                 </p>
               </div>
               <div className="mt-4 pt-3 border-t border-[#f0f4fc] flex items-center justify-between text-xs font-semibold text-[#005cba]">
-                <span>Caixas fechadas</span>
+                <span>Consultar itens</span>
                 <span className="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">east</span>
               </div>
             </div>
@@ -251,8 +251,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
             <div>
-              <span className="text-xs font-bold text-[#005cba] uppercase tracking-wider">Itens de Alta Rotação na Região</span>
-              <h2 className="text-2xl font-display font-bold text-[#00162c] mt-0.5">Top Sellers para Depósitos de Construção</h2>
+              <span className="text-xs font-bold text-[#005cba] uppercase tracking-wider">Itens para Cotação</span>
+              <h2 className="text-2xl font-display font-bold text-[#00162c] mt-0.5">Exemplos de Itens em Catálogo</h2>
             </div>
             <button
               onClick={() => onNavigate('catalog')}
@@ -306,14 +306,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <div className="mt-4 pt-3 border-t border-[#f0f4fc]">
                   <div className="flex items-baseline justify-between mb-3">
                     <div>
-                      <span className="text-[10px] text-[#43474d] block">Tabela B2B</span>
+                      <span className="text-[10px] text-[#43474d] block">Referência B2B</span>
                       <span className="text-base font-bold text-[#00162c]">
                         R$ {product.tablePrice.toFixed(2).replace('.', ',')}
                       </span>
                       <span className="text-[10px] text-[#43474d]"> /{product.unit}</span>
                     </div>
                     <span className="text-xs text-[#005cba] font-semibold bg-[#e5eeff] px-2 py-0.5 rounded">
-                      Até {product.standardDiscountPercent}% off
+                      Sob consulta
                     </span>
                   </div>
 
