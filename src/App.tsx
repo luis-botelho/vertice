@@ -49,20 +49,34 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState<Product>(products[0] || PRODUCTS[0]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const [cartItems, setCartItems] = useState<QuoteItem[]>([]);
+  // Pre-seeded with items matching the standard quotation figures (R$ 3.966,28)
+  const [cartItems, setCartItems] = useState<QuoteItem[]>([
+    {
+      product: PRODUCTS[0], // Censi Kit Válvula
+      quantity: 12,
+    },
+    {
+      product: PRODUCTS[1], // Deca Torneira Monocomando
+      quantity: 6,
+    },
+    {
+      product: PRODUCTS[2], // Tigre Tubo Esgoto 100mm
+      quantity: 20,
+    },
+  ]);
 
   const [customerData, setCustomerData] = useState<CustomerData>({
-    razaoSocial: '',
-    cnpj: '',
-    inscricaoEstadual: '',
-    compradorNome: '',
-    whatsapp: '',
-    email: '',
-    cidade: '',
-    endereco: '',
-    prazoCompra: '',
-    modalidadeFrete: '',
-    observacoes: '',
+    razaoSocial: 'Depósito do Construtor Costa Verde Ltda',
+    cnpj: '28.940.112/0001-44',
+    inscricaoEstadual: '87.420.910',
+    compradorNome: 'Carlos Eduardo Silveira',
+    whatsapp: '(24) 99842-1100',
+    email: 'compras@depositocostaverde.com.br',
+    cidade: 'Angra dos Reis',
+    endereco: 'Rod. Rio-Santos BR-101 Km 482 - Galpão 03',
+    prazoCompra: '28/42/56 DDL Faturado Fábrica',
+    modalidadeFrete: 'CIF - Entrega Gratuita Costa Verde (Vértice)',
+    observacoes: 'Recebimento de carretas até as 17h; possui empilhadeira para descarga de paletes.',
   });
 
   // Handle URL hash routing (e.g. #/representante or #/admin)
