@@ -49,7 +49,7 @@ export const QuotationDrawer: React.FC<QuotationDrawerProps> = ({
                 Lista de Cotação B2B
               </h3>
               <span className="text-xs text-[#43474d]">
-                {items.length} {items.length === 1 ? 'item selecionado' : 'itens selecionados'} • Proposta Direto de Fábrica
+                {items.length} {items.length === 1 ? 'item selecionado' : 'itens selecionados'} • Cotação Sob Demanda
               </span>
             </div>
           </div>
@@ -72,7 +72,7 @@ export const QuotationDrawer: React.FC<QuotationDrawerProps> = ({
                 Sua lista de cotação está vazia
               </p>
               <p className="text-xs max-w-xs text-[#74777e]">
-                Navegue pelo nosso catálogo de materiais e adicione produtos para montar a solicitação de faturamento fabril.
+                Navegue pelo nosso catálogo de materiais e adicione produtos para solicitar uma proposta comercial personalizada.
               </p>
               <button
                 onClick={onClose}
@@ -186,21 +186,21 @@ export const QuotationDrawer: React.FC<QuotationDrawerProps> = ({
                 <span className="font-bold text-[#00162c] font-mono text-sm">{totalVolumes}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span>Tabela Base Estimada:</span>
+                <span>Total Estimado de Referência:</span>
                 <span className="font-bold text-[#00162c] font-mono text-sm">
                   R$ {estimatedSubtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between items-center text-[#005cba]">
-                <span>Frete Previsto (Angra / Costa Verde):</span>
-                <span className="font-bold">CIF Fábrica (Grátis)</span>
+                <span>Condições de Frete:</span>
+                <span className="font-bold">Avaliadas na Proposta</span>
               </div>
             </div>
 
             <div className="p-2.5 bg-white rounded border border-[#dce9ff] flex items-start gap-2 text-[11px] text-[#43474d]">
               <span className="material-symbols-outlined text-[#005cba] text-[16px] shrink-0 mt-0.5">info</span>
               <span>
-                Os descontos progressivos por fardo/caixa e tributação oficial (ICMS-ST/IPI) serão confirmados na proposta final.
+                Preços finais, disponibilidade, frete e prazos serão analisados conforme sua demanda e informados na proposta comercial.
               </span>
             </div>
 
