@@ -27,7 +27,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="lg:col-span-7 flex flex-col gap-6">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#e5eeff] text-[#00162c] text-xs font-semibold w-fit border border-[#d2e2ff]">
                 <span className="w-2 h-2 rounded-full bg-[#005cba] animate-pulse"></span>
-                <span>Conectando marcas e mercados</span>
+                <span>SOLUÇÕES DE FORNECIMENTO B2B</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-[#00162c] leading-[1.12]">
@@ -35,7 +35,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </h1>
 
               <p className="text-lg text-[#43474d] leading-relaxed max-w-2xl">
-                Encontramos soluções de fornecimento para lojas e revendas de materiais de construção. Apresente sua necessidade, consulte nosso catálogo e solicite uma proposta comercial personalizada conforme quantidade, disponibilidade, destino e condições de fornecimento.
+                Encontre produtos para sua operação comercial, envie sua lista de materiais e solicite uma cotação personalizada. Avaliamos alternativas de fornecimento conforme os itens, as quantidades, o destino e as condições comerciais.
               </p>
 
               {/* CTAs */}
@@ -78,24 +78,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-[#d2e2ff] bg-white group">
                 <img
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkltAH6vYofp4Lf5pLUzE2eKotvFpM8-ZKYrlPCcM_a3sA5JC1LpC2OSLv5zKRiMT4jBTeBy4Qxfn9x37JcshtlfEL60EmWM0gbtf9HrHq97EcjxPPIWXmgMHAwFyEB575ihjrad84B26x3dsPrxHLk9HWaWA1O_-wAoYuBekJFGfuE-yC3E__oYczY3N9ADVqLSrY6N4EYvVzBBMdCSb9sTJMBFO1iYOlwbretEqJ8p5gW1cYquMWCQ"
-                  alt="Centro de Distribuição e Logística B2B"
+                  alt="Operação Comercial e Fornecimento B2B"
                   className="w-full h-[380px] object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#00162c]/90 via-[#00162c]/30 to-transparent flex flex-col justify-end p-6 text-white">
-                  <span className="text-xs font-semibold tracking-wider uppercase text-[#a0caff]">Logística Integrada</span>
-                  <h3 className="text-xl font-bold font-display text-white mt-1">Abastecimento Contínuo & Direto de Fábrica</h3>
-                  <p className="text-xs text-white/80 mt-1">Carretas completas e lotes fracionados para o comércio da Costa Verde.</p>
+                  <span className="text-xs font-semibold tracking-wider uppercase text-[#a0caff]">Catálogo Digital B2B</span>
+                  <h3 className="text-xl font-bold font-display text-white mt-1">Cotações Sob Demanda para sua Loja</h3>
+                  <p className="text-xs text-white/80 mt-1">Pesquisamos alternativas de fornecimento conforme os itens e volumes da sua lista.</p>
                 </div>
               </div>
 
               {/* Floating Quick Feature Badge */}
               <div className="absolute -bottom-5 -left-5 bg-white p-4 rounded-xl shadow-xl border border-[#e5eeff] flex items-center gap-3 max-w-[280px]">
                 <div className="w-10 h-10 rounded-lg bg-[#e5eeff] text-[#005cba] flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-[22px]">verified</span>
+                  <span className="material-symbols-outlined text-[22px]">manage_search</span>
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-[#00162c]">Indústrias Homologadas</h4>
-                  <p className="text-[11px] text-[#43474d]">Tigre, Deca, Censi, Docol, Prysmian, Schneider e mais.</p>
+                  <h4 className="text-xs font-bold text-[#00162c]">Pesquisa de Fornecimento</h4>
+                  <p className="text-[11px] text-[#43474d]">Avaliação caso a caso para depósitos e revendas da região.</p>
                 </div>
               </div>
             </div>
