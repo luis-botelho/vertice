@@ -422,31 +422,31 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="space-y-4 pt-2">
                 <div className="flex items-start gap-3">
                   <div className="w-7 h-7 rounded bg-[#005cba] flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="material-symbols-outlined text-[16px] text-white">check</span>
+                    <span className="material-symbols-outlined text-[16px] text-white">request_quote</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm">Preços com Tabela Zero da Indústria</h4>
-                    <p className="text-xs text-white/70">Acesso a campanhas de faturamento direto e bonificações sem comissões infladas.</p>
+                    <h4 className="font-semibold text-sm">Cotação conforme sua demanda</h4>
+                    <p className="text-xs text-white/70">Informe os produtos e as quantidades de que sua loja precisa para solicitar uma proposta comercial personalizada.</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <div className="w-7 h-7 rounded bg-[#005cba] flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="material-symbols-outlined text-[16px] text-white">check</span>
+                    <span className="material-symbols-outlined text-[16px] text-white">manage_search</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm">Visitas Presenciais Semanais</h4>
-                    <p className="text-xs text-white/70">Representante técnico in-loco para reposição de gôndola, suporte em projetos e treinamento de balconistas.</p>
+                    <h4 className="font-semibold text-sm">Pesquisa de alternativas de fornecimento</h4>
+                    <p className="text-xs text-white/70">Avaliamos possibilidades de fornecimento conforme as características dos itens e as condições disponíveis para cada solicitação.</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <div className="w-7 h-7 rounded bg-[#005cba] flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="material-symbols-outlined text-[16px] text-white">check</span>
+                    <span className="material-symbols-outlined text-[16px] text-white">fact_check</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm">Respaldo em Garantia e Pós-Venda</h4>
-                    <p className="text-xs text-white/70">Canal direto com o SAC técnico das montadoras para trocas em balcão sem burocracia para o seu cliente final.</p>
+                    <h4 className="font-semibold text-sm">Condições analisadas caso a caso</h4>
+                    <p className="text-xs text-white/70">Preço, disponibilidade, frete e prazo são avaliados conforme a demanda antes da apresentação da proposta.</p>
                   </div>
                 </div>
               </div>
@@ -462,13 +462,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-[#00162c] via-transparent to-transparent flex items-end p-6">
                   <div className="bg-[#00162c]/90 backdrop-blur-md p-4 rounded-xl border border-white/10 w-full">
                     <div className="flex items-center justify-between text-xs font-semibold text-[#a0caff] mb-1">
-                      <span>Circuito Regional de Atendimento</span>
-                      <span>Seg a Sex: 08h - 18h</span>
+                      <span>Atuação comercial regional</span>
+                      <span>Costa Verde - RJ</span>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-white/90">
-                      <span>• Angra dos Reis (Sede & Logística)</span>
-                      <span>• Paraty (Polo Histórico & Náutico)</span>
-                      <span>• Mangaratiba (Condomínios)</span>
+                    <p className="text-xs text-white/90">
+                      Foco em oportunidades de fornecimento para lojas e revendas da Costa Verde.
+                    </p>
+                    <div className="flex items-center gap-3 text-[11px] text-[#a0caff] mt-2 pt-2 border-t border-white/10">
+                      <span>• Angra dos Reis</span>
+                      <span>• Paraty</span>
+                      <span>• Mangaratiba</span>
                     </div>
                   </div>
                 </div>
@@ -482,12 +485,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="rounded-2xl bg-gradient-to-r from-[#00162c] to-[#102b46] p-8 sm:p-12 text-white relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 border border-[#d2e2ff]/30 shadow-xl">
           <div className="max-w-xl">
-            <span className="text-xs font-bold text-[#a0caff] uppercase tracking-wider">Atendimento a Lojistas e Construtoras</span>
+            <span className="text-xs font-bold text-[#a0caff] uppercase tracking-wider">Cotações Sob Demanda</span>
             <h3 className="text-2xl sm:text-3xl font-display font-extrabold mt-1">
-              Pronto para cotar com preços e faturamento direto de fábrica?
+              Tem uma lista de materiais para cotar?
             </h3>
             <p className="text-xs sm:text-sm text-white/80 mt-2">
-              Envie sua lista de materiais ou monte seu pedido no catálogo técnico. Atendemos com condições especiais para pagamento em 28/42/56 DDL.
+              Envie os itens de que sua loja precisa. Vamos avaliar alternativas de fornecimento e as condições comerciais aplicáveis para preparar uma proposta quando houver viabilidade.
             </p>
           </div>
 
@@ -496,15 +499,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
               onClick={() => onNavigate('quotation-form')}
               className="w-full sm:w-auto px-6 py-3.5 rounded bg-[#005cba] hover:bg-[#2F80ED] text-white font-semibold text-sm transition-colors shadow-md cursor-pointer flex items-center justify-center gap-2"
             >
-              <span className="material-symbols-outlined text-[18px]">send</span>
-              <span>Iniciar Cotação com CNPJ</span>
+              <span className="material-symbols-outlined text-[18px]">edit_document</span>
+              <span>Enviar lista para cotação</span>
             </button>
             <button
-              onClick={() => onNavigate('contact')}
+              onClick={() => onNavigate('catalog')}
               className="w-full sm:w-auto px-6 py-3.5 rounded bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
-              <span className="material-symbols-outlined text-[18px]">call</span>
-              <span>Falar com Representante</span>
+              <span className="material-symbols-outlined text-[18px]">inventory_2</span>
+              <span>Explorar catálogo</span>
             </button>
           </div>
         </div>
