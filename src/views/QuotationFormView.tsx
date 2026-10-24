@@ -5,7 +5,7 @@ interface QuotationFormViewProps {
   cartItems: QuoteItem[];
   customerData: CustomerData;
   onUpdateCustomerData: (data: CustomerData) => void;
-  onSubmitQuotation: () => void;
+  onSubmitQuotation: () => Promise<void>;
   onNavigate: (view: AppView) => void;
   onUpdateQuantity: (productId: string, quantity: number) => void;
   onRemoveItem: (productId: string) => void;
@@ -42,7 +42,7 @@ export const QuotationFormView: React.FC<QuotationFormViewProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!termsAccepted) {
       setErrorMsg('É necessário aceitar os termos de processamento de cotação comercial B2B.');
@@ -53,8 +53,12 @@ export const QuotationFormView: React.FC<QuotationFormViewProps> = ({
       return;
     }
     setErrorMsg(null);
-    onSubmitQuotation();
-    onNavigate('quotation-success');
+    try {
+      await onSubmitQuotation();
+      onNavigate('quotation-success');
+    } catch (error) {
+      setErrorMsg(error instanceof Error ? error.message : 'Não foi possível enviar a cotação.');
+    }
   };
 
   // Calculations

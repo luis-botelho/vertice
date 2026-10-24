@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AppView } from '../types';
+import { apiRequest, AUTH_TOKEN_KEY } from '../lib/api';
 
 interface RepresentativeLoginViewProps {
   onLoginSuccess: () => void;
@@ -10,46 +11,28 @@ export const RepresentativeLoginView: React.FC<RepresentativeLoginViewProps> = (
   onLoginSuccess,
   onNavigate,
 }) => {
-  const [email, setEmail] = useState('marcos.andrade@verticerep.com.br');
-  const [password, setPassword] = useState('vertice2025');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
     setIsLoading(true);
 
-    setTimeout(() => {
-      // Validate credentials (authorized reps)
-      const validAccounts = [
-        { email: 'marcos.andrade@verticerep.com.br', pass: 'vertice2025' },
-        { email: 'representante@verticerep.com.br', pass: 'vertice2025' },
-        { email: 'admin@verticerep.com.br', pass: 'admin123' },
-      ];
-
-      const found = validAccounts.find(
-        (acc) =>
-          acc.email.toLowerCase() === email.trim().toLowerCase() &&
-          acc.pass === password
-      );
-
-      if (found || (email.includes('@') && password.length >= 6)) {
-        setIsLoading(false);
-        onLoginSuccess();
-      } else {
-        setIsLoading(false);
-        setErrorMessage(
-          'Credenciais não autorizadas. Verifique o e-mail corporativo e a senha fornecida pela diretoria comercial.'
-        );
-      }
-    }, 600);
-  };
-
-  const handleFillDemo = (repEmail: string, repPass: string) => {
-    setEmail(repEmail);
-    setPassword(repPass);
-    setErrorMessage(null);
+    try {
+      const result = await apiRequest<{accessToken: string}>('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({email, password}),
+      });
+      sessionStorage.setItem(AUTH_TOKEN_KEY, result.accessToken);
+      setIsLoading(false);
+      onLoginSuccess();
+    } catch (error) {
+      setIsLoading(false);
+      setErrorMessage(error instanceof Error ? error.message : 'Não foi possível validar o acesso.');
+    }
   };
 
   return (
@@ -144,26 +127,6 @@ export const RepresentativeLoginView: React.FC<RepresentativeLoginViewProps> = (
               </button>
             </div>
           </form>
-
-          {/* Preset Demo Access Card */}
-          <div className="mt-6 pt-5 border-t border-[#f0f4fc]">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#43474d] block mb-2">
-              Acesso Rápido para Demonstração:
-            </span>
-            <button
-              type="button"
-              onClick={() => handleFillDemo('marcos.andrade@verticerep.com.br', 'vertice2025')}
-              className="w-full p-2.5 rounded-lg bg-[#eff4ff] hover:bg-[#dce9ff] border border-[#d2e2ff] text-left transition-colors cursor-pointer flex items-center justify-between"
-            >
-              <div>
-                <strong className="text-xs text-[#00162c] block">Marcos Andrade (Costa Verde)</strong>
-                <span className="text-[11px] text-[#43474d]">marcos.andrade@verticerep.com.br</span>
-              </div>
-              <span className="text-[10px] bg-[#005cba] text-white px-2 py-0.5 rounded font-semibold">
-                Preencher
-              </span>
-            </button>
-          </div>
 
           {/* Strict Security Notice: No public registration */}
           <div className="mt-4 p-3 rounded-lg bg-[#f8f9ff] border border-[#edf2fa] text-[11px] text-[#43474d] flex items-start gap-2">

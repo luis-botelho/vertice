@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 : 'text-[#43474d] hover:text-[#00162c] hover:bg-[#eff4ff]'
             }`}
           >
-            Sobre a Vértice
+            Sobre
           </button>
           <button
             onClick={() => onNavigate('contact')}

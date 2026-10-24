@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AppView } from '../types';
+import { apiRequest } from '../lib/api';
 
 interface ContactViewProps {
   onNavigate: (view: AppView) => void;
@@ -12,17 +13,28 @@ export const ContactView: React.FC<ContactViewProps> = ({ onNavigate }) => {
   const [whatsapp, setWhatsapp] = useState('');
   const [city, setCity] = useState('Angra dos Reis');
   const [message, setMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormSubmitted(true);
-    setTimeout(() => {
-      setFormSubmitted(false);
+    setErrorMessage(null);
+    setIsSubmitting(true);
+    try {
+      await apiRequest('/contact', {
+        method: 'POST',
+        body: JSON.stringify({name, cnpj, whatsapp, city, message}),
+      });
+      setFormSubmitted(true);
       setName('');
       setCnpj('');
       setWhatsapp('');
       setMessage('');
-    }, 5000);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Não foi possível enviar a mensagem.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -150,6 +162,11 @@ export const ContactView: React.FC<ContactViewProps> = ({ onNavigate }) => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  {errorMessage && (
+                    <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs">
+                      {errorMessage}
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs font-semibold text-[#00162c] block mb-1">
@@ -228,10 +245,11 @@ export const ContactView: React.FC<ContactViewProps> = ({ onNavigate }) => {
                   <div className="pt-2 flex justify-end">
                     <button
                       type="submit"
-                      className="px-6 py-3.5 rounded-xl bg-[#00162c] hover:bg-[#005cba] text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer flex items-center gap-2 shadow-md"
+                      disabled={isSubmitting}
+                      className="px-6 py-3.5 rounded-xl bg-[#00162c] hover:bg-[#005cba] text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer flex items-center gap-2 shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       <span className="material-symbols-outlined text-[18px]">send</span>
-                      <span>Transmitir Mensagem Comercial</span>
+                      <span>{isSubmitting ? 'Enviando...' : 'Transmitir Mensagem Comercial'}</span>
                     </button>
                   </div>
                 </form>
