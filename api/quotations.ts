@@ -1,5 +1,5 @@
 import type {VercelRequest, VercelResponse} from '@vercel/node';
-import {allowMethods, jsonError, readString} from './_lib/http';
+import {allowMethods, applyCors, jsonError, readString} from './_lib/http';
 
 const hasSupabase =
   Boolean(process.env.SUPABASE_URL) && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -8,6 +8,10 @@ export default async function handler(
   request: VercelRequest,
   response: VercelResponse,
 ): Promise<void> {
+  if (applyCors(request, response)) {
+    return;
+  }
+
   if (!allowMethods(request, response, ['POST'])) {
     return;
   }
@@ -45,16 +49,7 @@ export default async function handler(
   }
 
   if (!hasSupabase) {
-    const now = new Date();
-    const protocol = `VTC-DEV-${now.getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0')}`;
-    response.status(201).json({
-      quotation: {
-        id: `dev-${Date.now()}`,
-        protocol,
-        created_at: now.toISOString(),
-        status: 'pending',
-      },
-    });
+    jsonError(response, 503, 'Serviço de cotações não configurado.');
     return;
   }
 
@@ -79,15 +74,6 @@ export default async function handler(
     response.status(201).json({quotation: data});
   } catch (err) {
     console.error('Failed to create quotation', err);
-    const now = new Date();
-    const protocol = `VTC-DEV-${now.getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0')}`;
-    response.status(201).json({
-      quotation: {
-        id: `dev-${Date.now()}`,
-        protocol,
-        created_at: now.toISOString(),
-        status: 'pending',
-      },
-    });
+    jsonError(response, 500, 'Não foi possível registrar a cotação.');
   }
 }

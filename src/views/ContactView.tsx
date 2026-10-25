@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { AppView } from '../types';
+import { AppView, RepresentativeData } from '../types';
 import { apiRequest } from '../lib/api';
 
 interface ContactViewProps {
   onNavigate: (view: AppView) => void;
+  representativeData: RepresentativeData;
 }
 
-export const ContactView: React.FC<ContactViewProps> = ({ onNavigate }) => {
+export const ContactView: React.FC<ContactViewProps> = ({ onNavigate, representativeData }) => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [name, setName] = useState('');
   const [cnpj, setCnpj] = useState('');
@@ -74,7 +75,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ onNavigate }) => {
                     <span className="text-[10px] uppercase font-bold text-[#005cba] block">
                       WhatsApp Comercial Direto
                     </span>
-                    <strong className="text-sm text-[#00162c]">(24) 99842-8820</strong>
+                    <strong className="text-sm text-[#00162c]">{representativeData.telefone}</strong>
                     <p className="text-[11px] text-[#43474d] mt-0.5">Atendimento de Seg. a Sex. das 07:30 às 18:30</p>
                   </div>
                 </div>
@@ -134,7 +135,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ onNavigate }) => {
               <span className="text-[10px] uppercase font-bold text-[#005cba]">Agendamento Presencial</span>
               <h4 className="font-bold text-[#00162c] text-sm">Receba o Representante no seu Depósito</h4>
               <p className="text-[#43474d] leading-relaxed">
-                Nosso consultor técnico Marcos Andrade realiza vistorias de gôndola, treinamento da sua equipe de balcão e conferência de tabelas diretamente no seu estabelecimento.
+                Nosso consultor técnico {representativeData.nome} realiza vistorias de gôndola, treinamento da sua equipe de balcão e conferência de tabelas diretamente no seu estabelecimento.
               </p>
             </div>
           </div>
@@ -157,7 +158,7 @@ export const ContactView: React.FC<ContactViewProps> = ({ onNavigate }) => {
                   </span>
                   <h3 className="font-bold text-sm text-emerald-900">Mensagem Transmitida com Sucesso!</h3>
                   <p className="text-xs text-emerald-700 max-w-sm mx-auto">
-                    O representante Marcos Andrade entrará em contato pelo WhatsApp informado em instantes.
+                    O representante {representativeData.nome} entrará em contato pelo WhatsApp informado em instantes.
                   </p>
                 </div>
               ) : (

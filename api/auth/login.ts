@@ -1,5 +1,5 @@
 import type {VercelRequest, VercelResponse} from '@vercel/node';
-import {allowMethods, jsonError, readString} from '../_lib/http';
+import {allowMethods, applyCors, jsonError, readString} from '../_lib/http';
 
 const hasSupabase =
   Boolean(process.env.SUPABASE_URL) && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY) && Boolean(process.env.SUPABASE_ANON_KEY);
@@ -8,6 +8,10 @@ export default async function handler(
   request: VercelRequest,
   response: VercelResponse,
 ): Promise<void> {
+  if (applyCors(request, response)) {
+    return;
+  }
+
   if (!allowMethods(request, response, ['POST'])) {
     return;
   }
@@ -20,15 +24,7 @@ export default async function handler(
   }
 
   if (!hasSupabase) {
-    if (email === 'demo@vertice.com.br' && password === 'demo123') {
-      response.status(200).json({
-        accessToken: 'dev-token',
-        expiresAt: Math.floor(Date.now() / 1000) + 3600,
-        user: {id: 'dev-user', email, role: 'admin'},
-      });
-      return;
-    }
-    jsonError(response, 401, 'Credenciais inválidas. (Modo dev: demo@vertice.com.br / demo123)');
+    jsonError(response, 503, 'Serviço de autenticação não configurado.');
     return;
   }
 
@@ -58,14 +54,6 @@ export default async function handler(
     });
   } catch (err) {
     console.error('Login error', err);
-    if (email === 'demo@vertice.com.br' && password === 'demo123') {
-      response.status(200).json({
-        accessToken: 'dev-token',
-        expiresAt: Math.floor(Date.now() / 1000) + 3600,
-        user: {id: 'dev-user', email, role: 'admin'},
-      });
-      return;
-    }
     jsonError(response, 500, 'Erro ao autenticar.');
   }
 }

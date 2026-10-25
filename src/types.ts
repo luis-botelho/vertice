@@ -1,15 +1,18 @@
-export type ProductCategory =
-  | 'Todos'
-  | 'Hidráulica & Conexões'
-  | 'Metais & Torneiras'
-  | 'Elétrica & Iluminação'
-  | 'Ferramentas & Acessórios';
+export interface CategoryNode {
+  id: string;
+  parentId: string | null;
+  name: string;
+  slug: string;
+  code: string;
+  level: number;
+  keywords: string[];
+}
 
 export interface Product {
   id: string;
   sku: string;
   name: string;
-  category: 'Hidráulica & Conexões' | 'Metais & Torneiras' | 'Elétrica & Iluminação' | 'Ferramentas & Acessórios';
+  categoryId: string;
   manufacturer: string;
   application: 'Residencial & Comercial Leve' | 'Predial / Infraestrutura' | 'Industrial & Náutico';
   material: 'PVC / CPVC' | 'Latão Cromado' | 'Cobre Eletrolítico' | 'Inox / Carbono' | 'Polímero / Borracha';
@@ -44,6 +47,7 @@ export interface Product {
 export interface QuoteItem {
   product: Product;
   quantity: number;
+  unitPrice?: number;
   notes?: string;
 }
 
@@ -59,6 +63,26 @@ export interface CustomerData {
   prazoCompra: string;
   modalidadeFrete: string;
   observacoes: string;
+}
+
+export interface RepresentativeData {
+  nome: string;
+  registro: string;
+  regiao: string;
+  mesaComercial: string;
+  telefone: string;
+  email: string;
+}
+
+export type QuotationStatus = 'pending' | 'in_review' | 'approved' | 'rejected';
+
+export interface QuotationRecord {
+  id: string;
+  protocol: string;
+  status: QuotationStatus;
+  createdAt: string;
+  customerData: CustomerData;
+  items: QuoteItem[];
 }
 
 export type AppView =

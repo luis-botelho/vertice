@@ -1,16 +1,15 @@
 import React from 'react';
 import { AppView, Product } from '../types';
-import { PRODUCTS } from '../data/products';
 
 interface HomeViewProps {
-  products?: Product[];
+  products: Product[];
   onNavigate: (view: AppView) => void;
   onSelectProduct: (product: Product) => void;
   onAddToCart: (product: Product, quantity?: number) => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
-  products = PRODUCTS,
+  products,
   onNavigate,
   onSelectProduct,
   onAddToCart,
@@ -264,7 +263,27 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
+            {featuredProducts.length === 0 ? (
+              <div className="sm:col-span-2 lg:col-span-4 rounded-xl border border-dashed border-[#b0c8eb] bg-[#f8f9ff] p-10 text-center">
+                <span className="material-symbols-outlined text-[42px] text-[#005cba]">
+                  inventory_2
+                </span>
+                <h3 className="mt-2 font-display text-base font-bold text-[#00162c]">
+                  Catálogo em atualização
+                </h3>
+                <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-[#43474d]">
+                  Os produtos serão exibidos aqui assim que forem cadastrados pela mesa comercial.
+                  Você também pode enviar sua lista diretamente para cotação.
+                </p>
+                <button
+                  onClick={() => onNavigate('quotation-form')}
+                  className="mt-4 rounded bg-[#00162c] px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#005cba] cursor-pointer"
+                >
+                  Enviar lista para cotação
+                </button>
+              </div>
+            ) : (
+              featuredProducts.map((product) => (
               <div
                 key={product.id}
                 className="bg-white rounded-xl border border-[#e5eeff] p-4 flex flex-col justify-between hover:border-[#005cba]/40 transition-all shadow-sm group"
@@ -337,7 +356,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   </div>
                 </div>
               </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>

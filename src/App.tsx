@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { AppView, Product, QuoteItem, CustomerData } from './types';
-import { PRODUCTS } from './data/products';
+import {
+  AppView,
+  Product,
+  QuoteItem,
+  CustomerData,
+  RepresentativeData,
+  QuotationRecord,
+} from './types';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { QuotationDrawer } from './components/QuotationDrawer';
@@ -15,26 +21,40 @@ import { RepresentativeDashboardView } from './views/RepresentativeDashboardView
 import { AboutView } from './views/AboutView';
 import { ContactView } from './views/ContactView';
 import { apiRequest, AUTH_TOKEN_KEY } from './lib/api';
+import { loadPersistedState, updatePersistedState } from './lib/storage';
 
-const STORAGE_KEY_PRODUCTS = 'vertice_products_catalog';
 const STORAGE_KEY_AUTH = 'vertice_rep_auth';
 
+const EMPTY_REPRESENTATIVE: RepresentativeData = {
+  nome: '',
+  registro: '',
+  regiao: '',
+  mesaComercial: '',
+  telefone: '',
+  email: '',
+};
+
+const EMPTY_CUSTOMER_DATA: CustomerData = {
+  razaoSocial: '',
+  cnpj: '',
+  inscricaoEstadual: '',
+  compradorNome: '',
+  whatsapp: '',
+  email: '',
+  cidade: '',
+  endereco: '',
+  prazoCompra: '',
+  modalidadeFrete: '',
+  observacoes: '',
+};
+
 export default function App() {
+  const [persistedState] = useState(() => loadPersistedState());
+
   // Products Catalog (Fed by representative & persisted in localStorage)
-  const [products, setProducts] = useState<Product[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY_PRODUCTS);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      }
-    } catch (e) {
-      console.warn('Erro ao carregar catálogo salvo:', e);
-    }
-    return PRODUCTS;
-  });
+  const [products, setProducts] = useState<Product[]>(() =>
+    Array.isArray(persistedState.products) ? persistedState.products : [],
+  );
 
   // Representative Authentication State (Restricted route)
   const [isRepAuthenticated, setIsRepAuthenticated] = useState<boolean>(() => {
@@ -45,39 +65,57 @@ export default function App() {
     }
   });
 
+  // Representative profile data (editable in the representative dashboard)
+  const [representativeData, setRepresentativeData] = useState<RepresentativeData>(() => ({
+    ...EMPTY_REPRESENTATIVE,
+    ...(persistedState.representative ?? {}),
+  }));
+
   const [currentView, setCurrentView] = useState<AppView>('home');
-  const [selectedProduct, setSelectedProduct] = useState<Product>(products[0] || PRODUCTS[0]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(
+    products[0] ?? null,
+  );
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Pre-seeded with items matching the standard quotation figures (R$ 3.966,28)
-  const [cartItems, setCartItems] = useState<QuoteItem[]>([
-    {
-      product: PRODUCTS[0], // Censi Kit Válvula
-      quantity: 12,
-    },
-    {
-      product: PRODUCTS[1], // Deca Torneira Monocomando
-      quantity: 6,
-    },
-    {
-      product: PRODUCTS[2], // Tigre Tubo Esgoto 100mm
-      quantity: 20,
-    },
-  ]);
+  // Quotation cart draft (persisted so the buyer can resume the journey)
+  const [cartItems, setCartItems] = useState<QuoteItem[]>(() =>
+    Array.isArray(persistedState.cart) ? persistedState.cart : [],
+  );
 
-  const [customerData, setCustomerData] = useState<CustomerData>({
-    razaoSocial: 'Depósito do Construtor Costa Verde Ltda',
-    cnpj: '28.940.112/0001-44',
-    inscricaoEstadual: '87.420.910',
-    compradorNome: 'Carlos Eduardo Silveira',
-    whatsapp: '(24) 99842-1100',
-    email: 'compras@depositocostaverde.com.br',
-    cidade: 'Angra dos Reis',
-    endereco: 'Rod. Rio-Santos BR-101 Km 482 - Galpão 03',
-    prazoCompra: '28/42/56 DDL Faturado Fábrica',
-    modalidadeFrete: 'CIF - Entrega Gratuita Costa Verde (Vértice)',
-    observacoes: 'Recebimento de carretas até as 17h; possui empilhadeira para descarga de paletes.',
-  });
+  // Customer draft (persisted across reloads and used by the representative desk)
+  const [customerData, setCustomerData] = useState<CustomerData>(() => ({
+    ...EMPTY_CUSTOMER_DATA,
+    ...(persistedState.customer ?? {}),
+  }));
+
+  // All submitted quotations (persisted so the representative can access them later)
+  const [quotations, setQuotations] = useState<QuotationRecord[]>(() =>
+    Array.isArray(persistedState.quotations) ? persistedState.quotations : [],
+  );
+
+  const [activeQuotationId, setActiveQuotationId] = useState<string | null>(
+    persistedState.activeQuotationId ?? null,
+  );
+
+  const activeQuotation =
+    quotations.find((quotation) => quotation.id === activeQuotationId) ?? quotations[0] ?? null;
+
+  // Persist the full customer journey as a single versioned JSON document
+  useEffect(() => {
+    updatePersistedState({ cart: cartItems });
+  }, [cartItems]);
+
+  useEffect(() => {
+    updatePersistedState({ customer: customerData });
+  }, [customerData]);
+
+  useEffect(() => {
+    updatePersistedState({ quotations });
+  }, [quotations]);
+
+  useEffect(() => {
+    updatePersistedState({ activeQuotationId });
+  }, [activeQuotationId]);
 
   // Handle URL hash routing (e.g. #/representante or #/admin)
   useEffect(() => {
@@ -99,7 +137,7 @@ export default function App() {
 
   const handleNavigate = (view: AppView) => {
     // If attempting to go to representative area without auth, redirect to login
-    if (view === 'representative-inbox' && !isRepAuthenticated) {
+    if ((view === 'representative-inbox' || view === 'proposal') && !isRepAuthenticated) {
       setCurrentView('representative-login');
       window.location.hash = '#/representante';
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -143,11 +181,20 @@ export default function App() {
 
   const handleSaveProducts = (newProducts: Product[]) => {
     setProducts(newProducts);
-    try {
-      localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(newProducts));
-    } catch (e) {
-      console.warn('Erro ao salvar no localStorage:', e);
-    }
+    updatePersistedState({ products: newProducts });
+  };
+
+  const handleSaveRepresentativeData = (data: RepresentativeData) => {
+    setRepresentativeData(data);
+    updatePersistedState({ representative: data });
+  };
+
+  const handleUpdateQuotation = (updatedQuotation: QuotationRecord) => {
+    const updatedQuotations = quotations.map((quotation) =>
+      quotation.id === updatedQuotation.id ? updatedQuotation : quotation,
+    );
+    setQuotations(updatedQuotations);
+    updatePersistedState({ quotations: updatedQuotations });
   };
 
   const handleAddToCart = (product: Product, quantity = 1) => {
@@ -182,8 +229,17 @@ export default function App() {
     setCartItems([]);
   };
 
+  const handleStartNewQuotation = () => {
+    handleClearCart();
+    setActiveQuotationId(null);
+    setIsCartOpen(false);
+    handleNavigate('catalog');
+  };
+
   const handleSubmitQuotation = async () => {
-    await apiRequest('/quotations', {
+    const response = await apiRequest<{
+      quotation?: { id?: string; protocol?: string; created_at?: string };
+    }>('/quotations', {
       method: 'POST',
       body: JSON.stringify({
         customer: customerData,
@@ -196,12 +252,47 @@ export default function App() {
         })),
       }),
     });
+
+    if (!response?.quotation?.id || !response.quotation.protocol) {
+      throw new Error('O servidor não confirmou o registro da cotação.');
+    }
+
+    const quotation: QuotationRecord = {
+      id: response.quotation.id,
+      protocol: response.quotation.protocol,
+      status: 'pending',
+      createdAt: response.quotation.created_at ?? new Date().toISOString(),
+      customerData: { ...customerData },
+      items: cartItems.map((item) => ({
+        product: item.product,
+        quantity: item.quantity,
+        notes: item.notes,
+      })),
+    };
+
+    const updatedQuotations = [
+      quotation,
+      ...quotations.filter((item) => item.id !== quotation.id),
+    ];
+
+    setQuotations(updatedQuotations);
+    setActiveQuotationId(quotation.id);
+
+    // Persist immediately so the data survives even if the tab is closed right after submission
+    updatePersistedState({
+      quotations: updatedQuotations,
+      activeQuotationId: quotation.id,
+    });
+
     setCurrentView('quotation-success');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Hide global navbar/footer when in dedicated representative login or dashboard for maximum security feel
-  const isRepAdminScreen = currentView === 'representative-login' || currentView === 'representative-inbox';
+  const isRepAdminScreen =
+    currentView === 'representative-login' ||
+    currentView === 'representative-inbox' ||
+    currentView === 'proposal';
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8f9ff] text-[#00162c] font-sans">
@@ -243,9 +334,10 @@ export default function App() {
           />
         )}
 
-        {currentView === 'product-detail' && (
+        {currentView === 'product-detail' && selectedProduct && (
           <ProductDetailView
             product={selectedProduct}
+            products={products}
             onNavigate={handleNavigate}
             onAddToCart={handleAddToCart}
             onSelectProduct={(prod) => setSelectedProduct(prod)}
@@ -266,9 +358,9 @@ export default function App() {
 
         {currentView === 'quotation-success' && (
           <QuotationSuccessView
-            cartItems={cartItems}
-            customerData={customerData}
-            onNavigate={handleNavigate}
+            quotation={activeQuotation}
+            representativeData={representativeData}
+            onStartNewQuotation={handleStartNewQuotation}
           />
         )}
 
@@ -276,6 +368,8 @@ export default function App() {
           <ProposalView
             customerData={customerData}
             cartItems={cartItems}
+            quotation={activeQuotation}
+            representativeData={representativeData}
             onNavigate={handleNavigate}
           />
         )}
@@ -293,8 +387,14 @@ export default function App() {
           <RepresentativeDashboardView
             products={products}
             onSaveProducts={handleSaveProducts}
-            customerData={customerData}
-            cartItems={cartItems}
+            representativeData={representativeData}
+            onSaveRepresentativeData={handleSaveRepresentativeData}
+            quotations={quotations}
+            onUpdateQuotation={handleUpdateQuotation}
+            onOpenProposal={(quotation) => {
+              setActiveQuotationId(quotation.id);
+              handleNavigate('proposal');
+            }}
             onNavigate={handleNavigate}
             onLogout={handleLogout}
           />
@@ -302,7 +402,9 @@ export default function App() {
 
         {currentView === 'about' && <AboutView onNavigate={handleNavigate} />}
 
-        {currentView === 'contact' && <ContactView onNavigate={handleNavigate} />}
+        {currentView === 'contact' && (
+          <ContactView onNavigate={handleNavigate} representativeData={representativeData} />
+        )}
       </main>
 
       {/* Slide-out Quotation Drawer */}

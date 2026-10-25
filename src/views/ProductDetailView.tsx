@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Product, AppView } from '../types';
-import { PRODUCTS } from '../data/products';
+import { getCategoryPath, getCategoryPathLabel } from '../data/categories';
 
 interface ProductDetailViewProps {
   product: Product;
+  products: Product[];
   onNavigate: (view: AppView) => void;
   onAddToCart: (product: Product, quantity: number) => void;
   onSelectProduct: (product: Product) => void;
@@ -11,6 +12,7 @@ interface ProductDetailViewProps {
 
 export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
   product,
+  products,
   onNavigate,
   onAddToCart,
   onSelectProduct,
@@ -20,9 +22,25 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
   const [activeTab, setActiveTab] = useState<'specs' | 'logistics' | 'application'>('specs');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const relatedProducts = PRODUCTS.filter(
-    (p) => p.category === product.category && p.id !== product.id
-  ).slice(0, 3);
+  const categoryPath = getCategoryPath(product.categoryId);
+  const categoryPathIds = new Set(categoryPath.map((category) => category.id));
+
+  const relatedProducts = products.filter((candidate) => {
+    if (candidate.id === product.id) return false;
+    return getCategoryPath(candidate.categoryId).some((category) =>
+      categoryPathIds.has(category.id),
+    );
+  })
+    .sort((a, b) => {
+      const sharedA = getCategoryPath(a.categoryId).filter((category) =>
+        categoryPathIds.has(category.id),
+      ).length;
+      const sharedB = getCategoryPath(b.categoryId).filter((category) =>
+        categoryPathIds.has(category.id),
+      ).length;
+      return sharedB - sharedA;
+    })
+    .slice(0, 3);
 
   const handleAdd = () => {
     onAddToCart(product, quantity);
@@ -65,7 +83,12 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
             Catálogo
           </button>
           <span>/</span>
-          <span className="text-[#43474d] shrink-0">{product.category}</span>
+          {categoryPath.map((category, index) => (
+            <React.Fragment key={category.id}>
+              {index > 0 && <span>/</span>}
+              <span className="text-[#43474d] shrink-0">{category.name}</span>
+            </React.Fragment>
+          ))}
           <span>/</span>
           <span className="font-semibold text-[#00162c] truncate">{product.name}</span>
         </div>
@@ -120,7 +143,9 @@ export const ProductDetailView: React.FC<ProductDetailViewProps> = ({
           <div className="lg:col-span-6 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold text-[#005cba] mb-1">
-                <span>{product.category}</span>
+                <span title={getCategoryPathLabel(product.categoryId)}>
+                  {categoryPath.slice(-2).map((category) => category.name).join(' › ')}
+                </span>
                 <span>•</span>
                 <span>Ref. Fábrica: {product.refFab || product.sku}</span>
               </div>

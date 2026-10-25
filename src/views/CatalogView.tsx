@@ -1,9 +1,19 @@
-import React, { useState, useMemo } from 'react';
-import { Product, ProductCategory, AppView } from '../types';
-import { PRODUCTS } from '../data/products';
+import React, { useDeferredValue, useMemo, useState } from 'react';
+import { Product, AppView } from '../types';
+import {
+  getCategoryById,
+  getCategoryPath,
+  getDescendantCategoryIds,
+  getRootCategories,
+} from '../data/categories';
+import { getSearchMatchLabel, searchProducts } from '../lib/productSearch';
+import {
+  AdvancedCatalogFilters,
+  AdvancedFilterValues,
+} from '../components/AdvancedCatalogFilters';
 
 interface CatalogViewProps {
-  products?: Product[];
+  products: Product[];
   onSelectProduct: (product: Product) => void;
   onNavigate: (view: AppView) => void;
   onAddToCart: (product: Product, quantity?: number) => void;
@@ -11,67 +21,84 @@ interface CatalogViewProps {
   onOpenCart: () => void;
 }
 
+const EMPTY_FILTERS: AdvancedFilterValues = {
+  selectedCategoryId: null,
+  selectedManufacturer: '',
+  selectedApplication: '',
+  selectedMaterial: '',
+};
+
+const QUICK_SEARCHES = [
+  'torneira parede',
+  'tubo pvc',
+  'disjuntor 32A',
+  'registro esfera',
+];
+
 export const CatalogView: React.FC<CatalogViewProps> = ({
-  products = PRODUCTS,
+  products,
   onSelectProduct,
   onNavigate,
   onAddToCart,
   cartCount,
   onOpenCart,
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState<ProductCategory>('Todos');
+  const [filters, setFilters] = useState<AdvancedFilterValues>(EMPTY_FILTERS);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedManufacturer, setSelectedManufacturer] = useState<string>('Todos');
-  const [selectedApplication, setSelectedApplication] = useState<string>('Todos');
-  const [inStockOnly, setInStockOnly] = useState(false);
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [addedProductId, setAddedProductId] = useState<string | null>(null);
 
-  const categories: ProductCategory[] = [
-    'Todos',
-    'Hidráulica & Conexões',
-    'Metais & Torneiras',
-    'Elétrica & Iluminação',
-    'Ferramentas & Acessórios',
-  ];
+  const rootCategories = useMemo(() => getRootCategories(), []);
 
-  const manufacturers = useMemo(() => {
-    const list = Array.from(new Set(products.map((p) => p.manufacturer)));
-    return ['Todos', ...list];
-  }, [products]);
+  const updateFilters = (patch: Partial<AdvancedFilterValues>) => {
+    setFilters((previous) => ({ ...previous, ...patch }));
+  };
 
-  const applications = useMemo(() => {
-    const list = Array.from(new Set(products.map((p) => p.application)));
-    return ['Todos', ...list];
-  }, [products]);
+  const activeRootId = filters.selectedCategoryId
+    ? getCategoryPath(filters.selectedCategoryId)[0]?.id ?? null
+    : null;
 
   const filteredProducts = useMemo(() => {
-    return products.filter((item) => {
-      // Category filter
-      if (selectedCategory !== 'Todos' && item.category !== selectedCategory) {
+    const allowedCategoryIds = filters.selectedCategoryId
+      ? new Set(getDescendantCategoryIds(filters.selectedCategoryId))
+      : null;
+
+    const baseProducts = products.filter((item) => {
+      if (allowedCategoryIds && !allowedCategoryIds.has(item.categoryId)) {
         return false;
       }
-      // Manufacturer filter
-      if (selectedManufacturer !== 'Todos' && item.manufacturer !== selectedManufacturer) {
+      if (
+        filters.selectedManufacturer &&
+        item.manufacturer !== filters.selectedManufacturer
+      ) {
         return false;
       }
-      // Application filter
-      if (selectedApplication !== 'Todos' && item.application !== selectedApplication) {
+      if (
+        filters.selectedApplication &&
+        item.application !== filters.selectedApplication
+      ) {
         return false;
       }
-      // Search query (name, sku, description, refFab)
-      if (searchQuery.trim() !== '') {
-        const q = searchQuery.toLowerCase();
-        const matches =
-          item.name.toLowerCase().includes(q) ||
-          item.sku.toLowerCase().includes(q) ||
-          item.manufacturer.toLowerCase().includes(q) ||
-          (item.refFab && item.refFab.toLowerCase().includes(q)) ||
-          item.description.toLowerCase().includes(q);
-        if (!matches) return false;
+      if (filters.selectedMaterial && item.material !== filters.selectedMaterial) {
+        return false;
       }
       return true;
     });
-  }, [selectedCategory, selectedManufacturer, selectedApplication, searchQuery, inStockOnly]);
+
+    return searchProducts(baseProducts, deferredSearchQuery);
+  }, [products, filters, deferredSearchQuery]);
+
+  const hasActiveFilters =
+    filters.selectedCategoryId !== null ||
+    filters.selectedManufacturer !== '' ||
+    filters.selectedApplication !== '' ||
+    filters.selectedMaterial !== '' ||
+    searchQuery.trim() !== '';
+
+  const clearFilters = () => {
+    setFilters(EMPTY_FILTERS);
+    setSearchQuery('');
+  };
 
   const handleAdd = (product: Product) => {
     onAddToCart(product, product.packageMasterUnits || 1);
@@ -113,17 +140,27 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
           {/* Category Chips Bar */}
           <div className="flex items-center gap-2 overflow-x-auto pt-6 pb-2 scrollbar-thin">
-            {categories.map((cat) => (
+            <button
+              onClick={() => updateFilters({ selectedCategoryId: null })}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                filters.selectedCategoryId === null
+                  ? 'bg-[#00162c] text-white shadow-sm'
+                  : 'bg-[#eff4ff] text-[#43474d] hover:bg-[#e2ecfd] hover:text-[#00162c]'
+              }`}
+            >
+              Todos
+            </button>
+            {rootCategories.map((category) => (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                key={category.id}
+                onClick={() => updateFilters({ selectedCategoryId: category.id })}
                 className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                  selectedCategory === cat
+                  activeRootId === category.id
                     ? 'bg-[#00162c] text-white shadow-sm'
                     : 'bg-[#eff4ff] text-[#43474d] hover:bg-[#e2ecfd] hover:text-[#00162c]'
                 }`}
               >
-                {cat}
+                {category.name}
               </button>
             ))}
           </div>
@@ -143,7 +180,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Nome, SKU ou Ref. Fábrica..."
+                  placeholder="Ex: cano PVC, torneira parede, disjuntor 32A..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg pl-9 pr-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#005cba]/20 focus:border-[#005cba]"
@@ -160,59 +197,34 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   </button>
                 )}
               </div>
+              <div className="mt-2 flex items-start gap-1.5 text-[10px] text-[#43474d] leading-relaxed">
+                <span className="material-symbols-outlined text-[13px] text-[#005cba]">auto_awesome</span>
+                <span>Busca inteligente por nome, SKU, categoria, marca, sinônimos e erros de digitação.</span>
+              </div>
+
+              {!searchQuery && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {QUICK_SEARCHES.map((term) => (
+                    <button
+                      key={term}
+                      type="button"
+                      onClick={() => setSearchQuery(term)}
+                      className="rounded-full border border-[#d2e2ff] bg-[#eff4ff] px-2.5 py-1 text-[10px] font-medium text-[#005cba] transition-colors hover:bg-[#dce9ff] cursor-pointer"
+                    >
+                      {term}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Manufacturer Filter */}
-            <div className="bg-white p-5 rounded-xl border border-[#e5eeff] shadow-sm">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#00162c] mb-3">
-                Fabricante / Marca
-              </h3>
-              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                {manufacturers.map((mfg) => (
-                  <label
-                    key={mfg}
-                    className="flex items-center gap-2 text-xs text-[#43474d] hover:text-[#00162c] cursor-pointer py-1"
-                  >
-                    <input
-                      type="radio"
-                      name="manufacturer"
-                      checked={selectedManufacturer === mfg}
-                      onChange={() => setSelectedManufacturer(mfg)}
-                      className="text-[#005cba] focus:ring-[#005cba]"
-                    />
-                    <span className={selectedManufacturer === mfg ? 'font-semibold text-[#00162c]' : ''}>
-                      {mfg}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
+            <AdvancedCatalogFilters
+              products={products}
+              values={filters}
+              onChange={updateFilters}
+              onClear={clearFilters}
+            />
 
-            {/* Application Filter */}
-            <div className="bg-white p-5 rounded-xl border border-[#e5eeff] shadow-sm">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#00162c] mb-3">
-                Segmento / Aplicação
-              </h3>
-              <div className="space-y-1.5">
-                {applications.map((app) => (
-                  <label
-                    key={app}
-                    className="flex items-center gap-2 text-xs text-[#43474d] hover:text-[#00162c] cursor-pointer py-1"
-                  >
-                    <input
-                      type="radio"
-                      name="application"
-                      checked={selectedApplication === app}
-                      onChange={() => setSelectedApplication(app)}
-                      className="text-[#005cba] focus:ring-[#005cba]"
-                    />
-                    <span className={selectedApplication === app ? 'font-semibold text-[#00162c]' : ''}>
-                      {app}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
 
             {/* Logistics info callout */}
             <div className="bg-[#eff4ff] p-4 rounded-xl border border-[#d2e2ff] text-xs text-[#00162c] space-y-2">
@@ -231,17 +243,15 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             {/* Results counter and active filters */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-[#e5eeff] gap-2">
               <div className="text-xs text-[#43474d]">
-                Exibindo <strong className="text-[#00162c] font-bold">{filteredProducts.length}</strong> produtos para cotação
+                Exibindo <strong className="text-[#00162c] font-bold">{filteredProducts.length}</strong>{' '}
+                {deferredSearchQuery.trim()
+                  ? 'correspondências inteligentes'
+                  : 'produtos para cotação'}
               </div>
 
-              {(selectedCategory !== 'Todos' || selectedManufacturer !== 'Todos' || selectedApplication !== 'Todos' || searchQuery) && (
+              {hasActiveFilters && (
                 <button
-                  onClick={() => {
-                    setSelectedCategory('Todos');
-                    setSelectedManufacturer('Todos');
-                    setSelectedApplication('Todos');
-                    setSearchQuery('');
-                  }}
+                  onClick={clearFilters}
                   className="text-xs text-[#005cba] font-semibold hover:underline flex items-center gap-1 self-start sm:self-auto cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-[14px]">close</span>
@@ -258,12 +268,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                   Tente alterar seus termos de busca ou redefinir os filtros de fabricante e categoria.
                 </p>
                 <button
-                  onClick={() => {
-                    setSelectedCategory('Todos');
-                    setSelectedManufacturer('Todos');
-                    setSelectedApplication('Todos');
-                    setSearchQuery('');
-                  }}
+                  onClick={clearFilters}
                   className="mt-4 px-4 py-2 bg-[#00162c] text-white rounded text-xs font-semibold hover:bg-[#005cba]"
                 >
                   Restaurar Filtros
@@ -271,8 +276,10 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => {
+                {filteredProducts.map((result) => {
+                  const product = result.product;
                   const isRecentlyAdded = addedProductId === product.id;
+                  const categoryLabel = getCategoryById(product.categoryId)?.name ?? '';
                   return (
                     <div
                       key={product.id}
@@ -307,7 +314,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                           <div className="flex items-center justify-between text-[11px] text-[#43474d]">
                             <span className="font-mono font-medium">{product.sku}</span>
                             <span className="text-[10px] bg-[#eff4ff] text-[#005cba] px-1.5 py-0.5 rounded font-medium">
-                              {product.category.split('&')[0].trim()}
+                              {categoryLabel}
                             </span>
                           </div>
 
@@ -324,6 +331,13 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
                           <p className="text-xs text-[#43474d] mt-1 line-clamp-2 leading-relaxed">
                             {product.description}
                           </p>
+
+                          {deferredSearchQuery.trim() && result.matchedFields.length > 0 && (
+                            <div className="mt-2 inline-flex items-center gap-1 rounded bg-[#eff4ff] border border-[#d2e2ff] px-2 py-1 text-[9px] font-semibold text-[#005cba]">
+                              <span className="material-symbols-outlined text-[12px]">auto_awesome</span>
+                              <span>Match: {getSearchMatchLabel(result)}</span>
+                            </div>
+                          )}
 
                           {/* Packing specs */}
                           <div className="mt-3 bg-[#f8f9ff] p-2 rounded border border-[#edf2fa] text-[11px] text-[#43474d] space-y-0.5">

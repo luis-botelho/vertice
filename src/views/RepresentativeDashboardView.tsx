@@ -1,11 +1,35 @@
-import React, { useState } from 'react';
-import { Product, CustomerData, QuoteItem, AppView, ProductCategory } from '../types';
+import React, { useDeferredValue, useMemo, useState } from 'react';
+import {
+  Product,
+  AppView,
+  RepresentativeData,
+  QuotationRecord,
+  QuotationStatus,
+  QuoteItem,
+} from '../types';
+import {
+  getItemDiscountPercent,
+  getItemUnitPrice,
+  getQuotationTotal,
+} from '../lib/quotations';
+import {
+  CATEGORY_OPTIONS,
+  DEFAULT_PRODUCT_CATEGORY_ID,
+  getCategoryById,
+  getCategoryPathLabel,
+  getDescendantCategoryIds,
+} from '../data/categories';
+import { generateProductSku } from '../lib/products';
+import { searchProducts } from '../lib/productSearch';
 
 interface RepresentativeDashboardViewProps {
   products: Product[];
   onSaveProducts: (products: Product[]) => void;
-  customerData: CustomerData;
-  cartItems: QuoteItem[];
+  representativeData: RepresentativeData;
+  onSaveRepresentativeData: (data: RepresentativeData) => void;
+  quotations: QuotationRecord[];
+  onUpdateQuotation: (quotation: QuotationRecord) => void;
+  onOpenProposal: (quotation: QuotationRecord) => void;
   onNavigate: (view: AppView) => void;
   onLogout: () => void;
 }
@@ -13,13 +37,19 @@ interface RepresentativeDashboardViewProps {
 export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewProps> = ({
   products,
   onSaveProducts,
-  customerData,
+  representativeData,
+  onSaveRepresentativeData,
+  quotations,
+  onUpdateQuotation,
+  onOpenProposal,
   onNavigate,
   onLogout,
 }) => {
-  const [activeTab, setActiveTab] = useState<'products' | 'quotes'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'quotes' | 'profile'>('products');
   const [productSearch, setProductSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('Todos');
+  const deferredProductSearch = useDeferredValue(productSearch);
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [repForm, setRepForm] = useState<RepresentativeData>(representativeData);
 
   // Modal State for Create / Edit Product
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,9 +58,11 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
 
   // Form Fields
   const [formName, setFormName] = useState('');
-  const [formSku, setFormSku] = useState('');
+  const [formSku, setFormSku] = useState(() =>
+    generateProductSku(DEFAULT_PRODUCT_CATEGORY_ID, products),
+  );
   const [formRefFab, setFormRefFab] = useState('');
-  const [formCategory, setFormCategory] = useState<Product['category']>('Hidráulica & Conexões');
+  const [formCategoryId, setFormCategoryId] = useState(DEFAULT_PRODUCT_CATEGORY_ID);
   const [formManufacturer, setFormManufacturer] = useState('Tigre');
   const [formApplication, setFormApplication] = useState<Product['application']>('Residencial & Comercial Leve');
   const [formMaterial, setFormMaterial] = useState<Product['material']>('PVC / CPVC');
@@ -49,17 +81,22 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
   );
 
   // Quotes Desk State
-  const [selectedTicket, setSelectedTicket] = useState<'VTC-2025-0841' | 'VTC-2025-0839' | 'VTC-2025-0835'>('VTC-2025-0841');
-  const [customDiscount, setCustomDiscount] = useState<number>(8.5);
+  const [selectedQuotationId, setSelectedQuotationId] = useState<string | null>(
+    quotations[0]?.id ?? null
+  );
+  const [newItemProductId, setNewItemProductId] = useState('');
   const [approvalNote, setApprovalNote] = useState('Cliente prioritário da rota Angra-Sul. Margem validada com gerência regional Tigre & Deca.');
+
+  const selectedQuotation =
+    quotations.find((quotation) => quotation.id === selectedQuotationId) ?? quotations[0] ?? null;
 
   // Open modal for new product
   const handleOpenCreateModal = () => {
     setEditingProduct(null);
     setFormName('');
-    setFormSku(`PRD-${Math.floor(1000 + Math.random() * 9000)}`);
+    setFormCategoryId(DEFAULT_PRODUCT_CATEGORY_ID);
+    setFormSku(generateProductSku(DEFAULT_PRODUCT_CATEGORY_ID, products));
     setFormRefFab('');
-    setFormCategory('Hidráulica & Conexões');
     setFormManufacturer('Tigre');
     setFormApplication('Residencial & Comercial Leve');
     setFormMaterial('PVC / CPVC');
@@ -85,7 +122,7 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
     setFormName(p.name);
     setFormSku(p.sku);
     setFormRefFab(p.refFab || '');
-    setFormCategory(p.category);
+    setFormCategoryId(p.categoryId);
     setFormManufacturer(p.manufacturer);
     setFormApplication(p.application);
     setFormMaterial(p.material);
@@ -117,7 +154,7 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
               name: formName,
               sku: formSku,
               refFab: formRefFab,
-              category: formCategory,
+              categoryId: formCategoryId,
               manufacturer: formManufacturer,
               application: formApplication,
               material: formMaterial,
@@ -144,7 +181,7 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
         name: formName,
         sku: formSku,
         refFab: formRefFab || formSku,
-        category: formCategory,
+        categoryId: formCategoryId,
         manufacturer: formManufacturer,
         application: formApplication,
         material: formMaterial,
@@ -196,26 +233,138 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
     }
   };
 
+  const handleFormCategoryChange = (categoryId: string) => {
+    setFormCategoryId(categoryId);
+    setFormSku(generateProductSku(categoryId, products, editingProduct?.id));
+  };
+
   // Filtered products in admin list
-  const filteredProducts = products.filter((p) => {
-    if (categoryFilter !== 'Todos' && p.category !== categoryFilter) return false;
-    if (productSearch.trim()) {
-      const q = productSearch.toLowerCase();
-      return (
-        p.name.toLowerCase().includes(q) ||
-        p.sku.toLowerCase().includes(q) ||
-        p.manufacturer.toLowerCase().includes(q)
-      );
+  const filteredProducts = useMemo(() => {
+    const allowedCategoryIds =
+      categoryFilter === 'all'
+        ? null
+        : new Set(getDescendantCategoryIds(categoryFilter));
+
+    const baseProducts = products.filter(
+      (product) =>
+        !allowedCategoryIds || allowedCategoryIds.has(product.categoryId),
+    );
+
+    return searchProducts(baseProducts, deferredProductSearch);
+  }, [products, categoryFilter, deferredProductSearch]);
+
+  const quoteStatusLabel: Record<QuotationStatus, string> = {
+    pending: 'Em Análise',
+    in_review: 'Em Revisão',
+    approved: 'Aprovada',
+    rejected: 'Recusada',
+  };
+
+  const quoteStatusClass: Record<QuotationStatus, string> = {
+    pending: 'bg-[#10b981]/20 text-[#047857]',
+    in_review: 'bg-amber-100 text-amber-800',
+    approved: 'bg-emerald-100 text-emerald-800',
+    rejected: 'bg-red-100 text-red-700',
+  };
+
+  const formatQuotationDate = (date: string) =>
+    new Date(date).toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+  const updateSelectedQuotationItems = (items: QuoteItem[]) => {
+    if (!selectedQuotation) return;
+    onUpdateQuotation({ ...selectedQuotation, items });
+  };
+
+  const handleUpdateItemQuantity = (index: number, quantity: number) => {
+    if (!selectedQuotation || Number.isNaN(quantity)) return;
+    const nextItems = selectedQuotation.items.map((item, itemIndex) =>
+      itemIndex === index
+        ? { ...item, quantity: Math.max(1, Math.floor(quantity)) }
+        : item,
+    );
+    updateSelectedQuotationItems(nextItems);
+  };
+
+  const handleUpdateItemPrice = (index: number, price: number) => {
+    if (!selectedQuotation || Number.isNaN(price)) return;
+    const nextItems = selectedQuotation.items.map((item, itemIndex) =>
+      itemIndex === index ? { ...item, unitPrice: Math.max(0, price) } : item,
+    );
+    updateSelectedQuotationItems(nextItems);
+  };
+
+  const handleRemoveQuotationItem = (index: number) => {
+    if (!selectedQuotation) return;
+    const nextItems = selectedQuotation.items.filter((_, itemIndex) => itemIndex !== index);
+    updateSelectedQuotationItems(nextItems);
+  };
+
+  const handleAddQuotationItem = () => {
+    if (!selectedQuotation) return;
+    const product = products.find((item) => item.id === newItemProductId);
+    if (!product) {
+      setToastMessage('Selecione um produto do catálogo para adicionar à cotação.');
+      setTimeout(() => setToastMessage(null), 3000);
+      return;
     }
-    return true;
-  });
+
+    const defaultPrice = Number(
+      (product.tablePrice * (1 - (product.standardDiscountPercent || 0) / 100)).toFixed(2),
+    );
+    const existingIndex = selectedQuotation.items.findIndex(
+      (item) => item.product.id === product.id,
+    );
+
+    const nextItems =
+      existingIndex >= 0
+        ? selectedQuotation.items.map((item, index) =>
+            index === existingIndex ? { ...item, quantity: item.quantity + 1 } : item,
+          )
+        : [...selectedQuotation.items, { product, quantity: 1, unitPrice: defaultPrice }];
+
+    updateSelectedQuotationItems(nextItems);
+    setNewItemProductId('');
+  };
 
   const handleSendWhatsApp = () => {
-    setToastMessage(`Enviando proposta timbrada via WhatsApp para ${customerData.whatsapp}...`);
+    if (!selectedQuotation) return;
+    setToastMessage(
+      `Enviando proposta timbrada via WhatsApp para ${selectedQuotation.customerData.whatsapp}...`
+    );
     setTimeout(() => {
       setToastMessage('Proposta oficial transmitida com sucesso para o comprador!');
       setTimeout(() => setToastMessage(null), 4000);
     }, 1200);
+  };
+
+  const handleOpenProposal = () => {
+    if (selectedQuotation) onOpenProposal(selectedQuotation);
+  };
+
+  const handleSaveRepresentativeProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!repForm.nome.trim() || !repForm.telefone.trim() || !repForm.email.trim()) return;
+
+    const normalizedData: RepresentativeData = {
+      ...repForm,
+      nome: repForm.nome.trim(),
+      registro: repForm.registro.trim(),
+      regiao: repForm.regiao.trim(),
+      mesaComercial: repForm.mesaComercial.trim(),
+      telefone: repForm.telefone.trim(),
+      email: repForm.email.trim(),
+    };
+
+    setRepForm(normalizedData);
+    onSaveRepresentativeData(normalizedData);
+    setToastMessage('Dados do representante técnico atualizados com sucesso!');
+    setTimeout(() => setToastMessage(null), 4000);
   };
 
   return (
@@ -244,7 +393,7 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
                 <span>Mesa de Gestão do Representante</span>
               </h1>
               <p className="text-xs text-white/70 mt-1">
-                Representante: <strong className="text-white">Marcos Andrade</strong> • Registro CORE-RJ Nº 44.912 • Circuito Costa Verde
+                Representante: <strong className="text-white">{representativeData.nome}</strong> • Registro CORE-RJ Nº {representativeData.registro} • {representativeData.regiao}
               </p>
             </div>
 
@@ -290,7 +439,19 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
               }`}
             >
               <span className="material-symbols-outlined text-[18px]">request_quote</span>
-              <span>Fila de Cotações Recebidas (3 ativas)</span>
+              <span>Fila de Cotações Recebidas ({quotations.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
+                activeTab === 'profile'
+                  ? 'border-[#2F80ED] text-white bg-white/5 rounded-t'
+                  : 'border-transparent text-white/60 hover:text-white'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">badge</span>
+              <span>Dados do Representante</span>
             </button>
           </div>
         </div>
@@ -307,7 +468,7 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
                 <div className="relative w-full sm:w-72">
                   <input
                     type="text"
-                    placeholder="Buscar por SKU, nome ou fabricante..."
+                    placeholder="Busque por SKU, nome, categoria ou sinônimo..."
                     value={productSearch}
                     onChange={(e) => setProductSearch(e.target.value)}
                     className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg pl-9 pr-3 py-2 text-xs focus:ring-2 focus:ring-[#005cba]/20 focus:border-[#005cba]"
@@ -320,13 +481,14 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="w-full sm:w-56 bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-[#005cba]/20 focus:border-[#005cba]"
+                  className="w-full sm:w-72 bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-[#005cba]/20 focus:border-[#005cba]"
                 >
-                  <option value="Todos">Todas as Categorias</option>
-                  <option value="Hidráulica & Conexões">Hidráulica & Conexões</option>
-                  <option value="Metais & Torneiras">Metais & Torneiras</option>
-                  <option value="Elétrica & Iluminação">Elétrica & Iluminação</option>
-                  <option value="Ferramentas & Acessórios">Ferramentas & Acessórios</option>
+                  <option value="all">Todas as Categorias</option>
+                  {CATEGORY_OPTIONS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.pathLabel}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -345,7 +507,10 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
             <div className="bg-white rounded-2xl border border-[#d2e2ff] shadow-sm overflow-hidden">
               <div className="p-4 bg-[#f8f9ff] border-b border-[#e5eeff] flex items-center justify-between">
                 <div className="text-xs text-[#43474d]">
-                  Exibindo <strong className="text-[#00162c] font-bold">{filteredProducts.length}</strong> produtos disponíveis para faturamento direto
+                  Exibindo <strong className="text-[#00162c] font-bold">{filteredProducts.length}</strong>{' '}
+                  {deferredProductSearch.trim()
+                    ? 'correspondências para a busca'
+                    : 'produtos disponíveis para faturamento direto'}
                 </div>
                 <div className="text-[11px] font-semibold text-[#005cba] flex items-center gap-1">
                   <span className="material-symbols-outlined text-[14px]">sync</span>
@@ -368,7 +533,7 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#f0f4fc]">
-                    {filteredProducts.map((p) => (
+                    {filteredProducts.map(({ product: p }) => (
                       <tr key={p.id} className="hover:bg-[#f8f9ff]">
                         <td className="py-3 px-4">
                           <div className="w-10 h-10 rounded bg-[#f8f9ff] border border-[#e5eeff] flex items-center justify-center overflow-hidden p-1">
@@ -387,7 +552,17 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
                         <td className="py-3 px-4">
                           <span className="font-semibold text-[#00162c]">{p.manufacturer}</span>
                         </td>
-                        <td className="py-3 px-4 text-[#43474d]">{p.category}</td>
+                        <td className="py-3 px-4 text-[#43474d]">
+                          <span className="font-semibold text-[#00162c] block">
+                            {getCategoryById(p.categoryId)?.name ?? 'Sem categoria'}
+                          </span>
+                          <span
+                            className="text-[10px] block max-w-[220px] truncate"
+                            title={getCategoryPathLabel(p.categoryId)}
+                          >
+                            {getCategoryPathLabel(p.categoryId, ' › ')}
+                          </span>
+                        </td>
                         <td className="py-3 px-4 text-[#43474d]">
                           <span className="font-medium text-[#00162c]">{p.packageMaster}</span>
                           <span className="text-[10px] block text-[#43474d]">Mín: {p.minOrderQuantity} un</span>
@@ -435,159 +610,373 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
             <div className="lg:col-span-4 space-y-4">
               <div className="bg-white p-4 rounded-xl border border-[#d2e2ff] shadow-sm">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[#00162c] mb-3">
-                  Cotações na Praça Costa Verde
+                  Cotações Recebidas ({quotations.length})
                 </h3>
                 <div className="space-y-2">
-                  <div
-                    onClick={() => setSelectedTicket('VTC-2025-0841')}
-                    className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                      selectedTicket === 'VTC-2025-0841'
-                        ? 'bg-[#eff4ff] border-[#005cba]'
-                        : 'bg-white border-[#e5eeff]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="font-mono font-bold text-[#005cba]">#VTC-2025-0841</span>
-                      <span className="bg-[#10b981]/20 text-[#047857] text-[10px] font-bold px-2 py-0.5 rounded">
-                        Em Análise
-                      </span>
+                  {quotations.length === 0 && (
+                    <div className="p-4 rounded-lg bg-[#f8f9ff] border border-dashed border-[#d2e2ff] text-center text-[11px] text-[#43474d]">
+                      Nenhuma cotação transmitida ainda. As cotações enviadas pelos compradores aparecerão aqui.
                     </div>
-                    <h4 className="font-bold text-xs text-[#00162c]">{customerData.razaoSocial}</h4>
-                    <div className="flex items-center justify-between text-[11px] text-[#43474d] mt-2">
-                      <span>Angra dos Reis - RJ</span>
-                      <strong className="text-[#00162c]">~R$ 3.966,28</strong>
-                    </div>
-                  </div>
+                  )}
 
-                  <div
-                    onClick={() => setSelectedTicket('VTC-2025-0839')}
-                    className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                      selectedTicket === 'VTC-2025-0839'
-                        ? 'bg-[#eff4ff] border-[#005cba]'
-                        : 'bg-white border-[#e5eeff]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="font-mono font-bold text-[#43474d]">#VTC-2025-0839</span>
-                      <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded">
-                        Aguardando NFe
+                  {quotations.map((quotation) => (
+                    <div
+                      key={quotation.id}
+                      onClick={() => setSelectedQuotationId(quotation.id)}
+                      className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                        selectedQuotation?.id === quotation.id
+                          ? 'bg-[#eff4ff] border-[#005cba]'
+                          : 'bg-white border-[#e5eeff]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="font-mono font-bold text-[#005cba]">#{quotation.protocol}</span>
+                        <span className={`${quoteStatusClass[quotation.status]} text-[10px] font-bold px-2 py-0.5 rounded`}>
+                          {quoteStatusLabel[quotation.status]}
+                        </span>
+                      </div>
+                      <h4 className="font-bold text-xs text-[#00162c]">{quotation.customerData.razaoSocial}</h4>
+                      <div className="flex items-center justify-between text-[11px] text-[#43474d] mt-2">
+                        <span>{quotation.customerData.cidade}</span>
+                        <strong className="text-[#00162c]">
+                          R$ {getQuotationTotal(quotation).toFixed(2).replace('.', ',')}
+                        </strong>
+                      </div>
+                      <span className="text-[10px] text-[#43474d] block mt-1">
+                        {formatQuotationDate(quotation.createdAt)}
                       </span>
                     </div>
-                    <h4 className="font-bold text-xs text-[#00162c]">Madeireira & Materiais Paraty Ltda</h4>
-                    <div className="flex items-center justify-between text-[11px] text-[#43474d] mt-2">
-                      <span>Paraty - RJ</span>
-                      <strong className="text-[#00162c]">R$ 14.820,00</strong>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
 
             {/* Right Details */}
             <div className="lg:col-span-8 space-y-6">
-              <div className="bg-white p-6 rounded-2xl border border-[#d2e2ff] shadow-sm space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#f0f4fc] gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-extrabold text-lg text-[#00162c]">
-                        Ticket #{selectedTicket}
-                      </span>
-                      <span className="bg-[#10b981] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-                        CNPJ Habilitado SEFAZ-RJ
-                      </span>
+              {selectedQuotation ? (
+                <div className="bg-white p-6 rounded-2xl border border-[#d2e2ff] shadow-sm space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#f0f4fc] gap-3">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono font-extrabold text-lg text-[#00162c]">
+                          Ticket #{selectedQuotation.protocol}
+                        </span>
+                        <span className={`${quoteStatusClass[selectedQuotation.status]} text-[10px] font-bold px-2.5 py-0.5 rounded-full`}>
+                          {quoteStatusLabel[selectedQuotation.status]}
+                        </span>
+                      </div>
+                      <p className="text-xs text-[#43474d] mt-0.5">
+                        Transmitido em {formatQuotationDate(selectedQuotation.createdAt)} via Portal B2B Vértice
+                      </p>
                     </div>
-                    <p className="text-xs text-[#43474d] mt-0.5">
-                      Transmitido em 24/10/2025 às 14:22 via Portal B2B Vértice
-                    </p>
+
+                    <button
+                      onClick={handleOpenProposal}
+                      className="px-4 py-2 rounded-lg bg-[#00162c] hover:bg-[#005cba] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">description</span>
+                      <span>Visualizar Espelho Timbrado</span>
+                    </button>
                   </div>
 
-                  <button
-                    onClick={() => onNavigate('proposal')}
-                    className="px-4 py-2 rounded-lg bg-[#00162c] hover:bg-[#005cba] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">description</span>
-                    <span>Visualizar Espelho Timbrado</span>
-                  </button>
-                </div>
+                  {/* Customer Data */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#f8f9ff] p-4 rounded-xl border border-[#e5eeff] text-xs">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-[#005cba] block mb-1">
+                        Dados da Empresa Faturada
+                      </span>
+                      <h4 className="font-bold text-[#00162c]">{selectedQuotation.customerData.razaoSocial}</h4>
+                      <p className="text-[#43474d] mt-1 space-y-0.5">
+                        <span>CNPJ: <strong>{selectedQuotation.customerData.cnpj}</strong></span><br />
+                        <span>IE: <strong>{selectedQuotation.customerData.inscricaoEstadual}</strong></span><br />
+                        <span>Comprador: <strong>{selectedQuotation.customerData.compradorNome} ({selectedQuotation.customerData.whatsapp})</strong></span>
+                      </p>
+                    </div>
 
-                {/* Customer Data */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-[#f8f9ff] p-4 rounded-xl border border-[#e5eeff] text-xs">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-[#005cba] block mb-1">
-                      Dados da Empresa Faturada
-                    </span>
-                    <h4 className="font-bold text-[#00162c]">{customerData.razaoSocial}</h4>
-                    <p className="text-[#43474d] mt-1 space-y-0.5">
-                      <span>CNPJ: <strong>{customerData.cnpj}</strong></span><br />
-                      <span>IE: <strong>{customerData.inscricaoEstadual}</strong></span><br />
-                      <span>Comprador: <strong>{customerData.compradorNome} ({customerData.whatsapp})</strong></span>
-                    </p>
-                  </div>
-
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-[#005cba] block mb-1">
-                      Condições do Pedido
-                    </span>
-                    <div className="space-y-1 text-[#43474d]">
-                      <div>Prazo: <strong>{customerData.prazoCompra}</strong></div>
-                      <div>Frete: <strong>{customerData.modalidadeFrete}</strong></div>
-                      <div>Rating de Crédito: <strong className="text-emerald-700">A+ (Limite: R$ 65.000)</strong></div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-[#005cba] block mb-1">
+                        Condições do Pedido
+                      </span>
+                      <div className="space-y-1 text-[#43474d]">
+                        <div>Prazo: <strong>{selectedQuotation.customerData.prazoCompra}</strong></div>
+                        <div>Frete: <strong>{selectedQuotation.customerData.modalidadeFrete}</strong></div>
+                        <div>Rating de Crédito: <strong className="text-emerald-700">A+ (Limite: R$ 65.000)</strong></div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Margin slider */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase text-[#00162c]">
-                      Ajuste de Margem Comercial do Representante
-                    </span>
-                    <span className="text-xs font-bold text-[#005cba]">Desconto: -{customDiscount}%</span>
+                  {/* Quoted Items - editable */}
+                  <div>
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                      <div>
+                        <span className="text-xs font-bold uppercase text-[#00162c]">
+                          Itens da Cotação ({selectedQuotation.items.length})
+                        </span>
+                        <p className="text-[10px] text-[#43474d]">
+                          Preços e quantidades editáveis. As alterações são salvas automaticamente em JSON.
+                        </p>
+                      </div>
+                      <strong className="text-xs text-[#00162c]">
+                        Total: R$ {getQuotationTotal(selectedQuotation).toFixed(2).replace('.', ',')}
+                      </strong>
+                    </div>
+
+                    <div className="border border-[#e5eeff] rounded-xl overflow-x-auto">
+                      <table className="w-full text-left text-xs min-w-[620px]">
+                        <thead className="bg-[#f8f9ff] text-[#43474d] border-b border-[#e5eeff]">
+                          <tr>
+                            <th className="py-2 px-3 font-semibold">Item</th>
+                            <th className="py-2 px-3 font-semibold text-center w-28">Qtd</th>
+                            <th className="py-2 px-3 font-semibold text-right w-32">Preço Unit.</th>
+                            <th className="py-2 px-3 font-semibold text-center w-20">Desc.</th>
+                            <th className="py-2 px-3 font-semibold text-right w-28">Total</th>
+                            <th className="py-2 px-3 font-semibold text-center w-12"></th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#f0f4fc]">
+                          {selectedQuotation.items.map((item, index) => {
+                            const unitPrice = getItemUnitPrice(item);
+                            const discount = getItemDiscountPercent(item);
+                            return (
+                              <tr key={`${item.product.id}-${index}`}>
+                                <td className="py-2.5 px-3">
+                                  <span className="font-mono text-[10px] text-[#43474d] block">
+                                    {item.product.sku}
+                                  </span>
+                                  <span className="block text-xs font-semibold text-[#00162c]">
+                                    {item.product.name}
+                                  </span>
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <div className="flex items-center justify-center gap-1">
+                                    <input
+                                      type="number"
+                                      min="1"
+                                      step="1"
+                                      value={item.quantity}
+                                      onChange={(e) =>
+                                        handleUpdateItemQuantity(index, e.target.valueAsNumber)
+                                      }
+                                      className="w-16 bg-white border border-[#d2e2ff] rounded px-2 py-1 text-xs text-center font-bold focus:ring-2 focus:ring-[#005cba]/20 focus:border-[#005cba]"
+                                    />
+                                    <span className="text-[10px] text-[#43474d]">{item.product.unit}</span>
+                                  </div>
+                                </td>
+                                <td className="py-2.5 px-3 text-right">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={Number(unitPrice.toFixed(2))}
+                                    onChange={(e) =>
+                                      handleUpdateItemPrice(index, e.target.valueAsNumber)
+                                    }
+                                    className="w-24 bg-white border border-[#d2e2ff] rounded px-2 py-1 text-xs text-right font-semibold focus:ring-2 focus:ring-[#005cba]/20 focus:border-[#005cba]"
+                                  />
+                                </td>
+                                <td className="py-2.5 px-3 text-center font-bold text-[#005cba]">
+                                  {discount >= 0 ? '-' : '+'}
+                                  {Math.abs(discount).toFixed(1)}%
+                                </td>
+                                <td className="py-2.5 px-3 text-right font-bold text-[#00162c]">
+                                  R$ {(unitPrice * item.quantity).toFixed(2).replace('.', ',')}
+                                </td>
+                                <td className="py-2.5 px-3 text-center">
+                                  <button
+                                    onClick={() => handleRemoveQuotationItem(index)}
+                                    title="Remover item"
+                                    className="w-8 h-8 rounded bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center cursor-pointer transition-colors"
+                                  >
+                                    <span className="material-symbols-outlined text-[16px]">delete</span>
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+
+                          {selectedQuotation.items.length === 0 && (
+                            <tr>
+                              <td colSpan={6} className="py-6 px-3 text-center text-[#43474d]">
+                                Nenhum item nesta cotação. Adicione um produto abaixo.
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-2 mt-3">
+                      <select
+                        value={newItemProductId}
+                        onChange={(e) => setNewItemProductId(e.target.value)}
+                        className="flex-1 bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-[#005cba]/20 focus:border-[#005cba]"
+                      >
+                        <option value="">Selecione um produto do catálogo...</option>
+                        {products.map((product) => (
+                          <option key={product.id} value={product.id}>
+                            {product.sku} - {product.name}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        onClick={handleAddQuotationItem}
+                        className="px-4 py-2 rounded-lg bg-[#eff4ff] hover:bg-[#dce9ff] text-[#005cba] text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">add_circle</span>
+                        <span>Adicionar Item</span>
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Notes */}
+                  <div>
+                    <label className="text-xs font-bold uppercase text-[#00162c] block mb-1">
+                      Parecer Técnico para a Expedição da Fábrica:
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={approvalNote}
+                      onChange={(e) => setApprovalNote(e.target.value)}
+                      className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg p-2.5 text-xs text-[#00162c]"
+                    ></textarea>
+                  </div>
+
+                  {/* Dispatch buttons */}
+                  <div className="pt-4 border-t border-[#f0f4fc] flex flex-wrap items-center justify-between gap-3">
+                    <button
+                      onClick={handleSendWhatsApp}
+                      className="px-4 py-2.5 rounded-lg bg-[#25D366] hover:bg-[#1ebd5b] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">chat</span>
+                      <span>Disparar Proposta no WhatsApp</span>
+                    </button>
+
+                    <button
+                      onClick={handleOpenProposal}
+                      className="px-5 py-2.5 rounded-lg bg-[#005cba] hover:bg-[#2F80ED] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">task_alt</span>
+                      <span>Emitir Proposta Oficial Timbrada</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white p-10 rounded-2xl border border-[#d2e2ff] shadow-sm text-center">
+                  <span className="material-symbols-outlined text-[40px] text-[#005cba]">inbox</span>
+                  <h3 className="font-bold text-sm text-[#00162c] mt-2">Nenhuma cotação selecionada</h3>
+                  <p className="text-xs text-[#43474d] mt-1">
+                    Aguarde o envio de uma cotação pelo portal do comprador para visualizar os dados completos.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {/* TAB 3: REPRESENTATIVE PROFILE */}
+        {activeTab === 'profile' && (
+          <div className="max-w-3xl">
+            <form
+              onSubmit={handleSaveRepresentativeProfile}
+              className="bg-white p-6 sm:p-8 rounded-2xl border border-[#d2e2ff] shadow-sm space-y-5"
+            >
+              <div className="pb-4 border-b border-[#f0f4fc]">
+                <h2 className="text-base font-bold text-[#00162c] flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[#005cba]">badge</span>
+                  <span>Informações do Representante Técnico Responsável</span>
+                </h2>
+                <p className="text-xs text-[#43474d] mt-1">
+                  Estes dados são exibidos ao comprador no protocolo da cotação e nos canais de atendimento.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold uppercase text-[#00162c] block mb-1">
+                    Nome do Representante *
+                  </label>
                   <input
-                    type="range"
-                    min="5"
-                    max="15"
-                    step="0.5"
-                    value={customDiscount}
-                    onChange={(e) => setCustomDiscount(Number(e.target.value))}
-                    className="w-full accent-[#005cba] cursor-pointer"
+                    type="text"
+                    required
+                    value={repForm.nome}
+                    onChange={(e) => setRepForm({ ...repForm, nome: e.target.value })}
+                    className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-[#005cba]/20 focus:border-[#005cba]"
                   />
                 </div>
 
-                {/* Notes */}
                 <div>
                   <label className="text-xs font-bold uppercase text-[#00162c] block mb-1">
-                    Parecer Técnico para a Expedição da Fábrica:
+                    Registro CORE
                   </label>
-                  <textarea
-                    rows={2}
-                    value={approvalNote}
-                    onChange={(e) => setApprovalNote(e.target.value)}
-                    className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg p-2.5 text-xs text-[#00162c]"
-                  ></textarea>
+                  <input
+                    type="text"
+                    value={repForm.registro}
+                    onChange={(e) => setRepForm({ ...repForm, registro: e.target.value })}
+                    className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs font-mono"
+                  />
                 </div>
 
-                {/* Dispatch buttons */}
-                <div className="pt-4 border-t border-[#f0f4fc] flex flex-wrap items-center justify-between gap-3">
-                  <button
-                    onClick={handleSendWhatsApp}
-                    className="px-4 py-2.5 rounded-lg bg-[#25D366] hover:bg-[#1ebd5b] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">chat</span>
-                    <span>Disparar Proposta no WhatsApp</span>
-                  </button>
+                <div>
+                  <label className="text-xs font-bold uppercase text-[#00162c] block mb-1">
+                    Região de Atuação
+                  </label>
+                  <input
+                    type="text"
+                    value={repForm.regiao}
+                    onChange={(e) => setRepForm({ ...repForm, regiao: e.target.value })}
+                    className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs"
+                  />
+                </div>
 
-                  <button
-                    onClick={() => onNavigate('proposal')}
-                    className="px-5 py-2.5 rounded-lg bg-[#005cba] hover:bg-[#2F80ED] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
-                  >
-                    <span className="material-symbols-outlined text-[16px]">task_alt</span>
-                    <span>Emitir Proposta Oficial Timbrada</span>
-                  </button>
+                <div>
+                  <label className="text-xs font-bold uppercase text-[#00162c] block mb-1">
+                    Mesa Comercial
+                  </label>
+                  <input
+                    type="text"
+                    value={repForm.mesaComercial}
+                    onChange={(e) => setRepForm({ ...repForm, mesaComercial: e.target.value })}
+                    className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold uppercase text-[#00162c] block mb-1">
+                    Telefone / WhatsApp *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={repForm.telefone}
+                    onChange={(e) => setRepForm({ ...repForm, telefone: e.target.value })}
+                    className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold uppercase text-[#00162c] block mb-1">
+                    E-mail Comercial *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={repForm.email}
+                    onChange={(e) => setRepForm({ ...repForm, email: e.target.value })}
+                    className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs"
+                  />
                 </div>
               </div>
-            </div>
+
+              <div className="pt-4 border-t border-[#f0f4fc] flex items-center justify-end">
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-lg bg-[#00162c] hover:bg-[#005cba] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-md"
+                >
+                  <span className="material-symbols-outlined text-[16px]">save</span>
+                  <span>Salvar Dados do Representante</span>
+                </button>
+              </div>
+            </form>
           </div>
         )}
       </div>
@@ -639,16 +1028,18 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="text-xs font-bold uppercase text-[#00162c] block mb-1">
-                    Código SKU *
+                    Código SKU Automático *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="HYD-CRV-100"
+                    readOnly
                     value={formSku}
-                    onChange={(e) => setFormSku(e.target.value)}
-                    className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs font-mono"
+                    className="w-full bg-[#f0f4fc] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs font-mono text-[#43474d] cursor-not-allowed"
                   />
+                  <span className="text-[9px] text-[#43474d] block mt-1">
+                    Gerado pela categoria; altere a categoria para recalcular.
+                  </span>
                 </div>
 
                 <div>
@@ -667,17 +1058,18 @@ export const RepresentativeDashboardView: React.FC<RepresentativeDashboardViewPr
 
                 <div>
                   <label className="text-xs font-bold uppercase text-[#00162c] block mb-1">
-                    Categoria *
+                    Categoria Hierárquica *
                   </label>
                   <select
-                    value={formCategory}
-                    onChange={(e) => setFormCategory(e.target.value as any)}
+                    value={formCategoryId}
+                    onChange={(e) => handleFormCategoryChange(e.target.value)}
                     className="w-full bg-[#f8f9ff] border border-[#d2e2ff] rounded-lg px-3 py-2 text-xs"
                   >
-                    <option value="Hidráulica & Conexões">Hidráulica & Conexões</option>
-                    <option value="Metais & Torneiras">Metais & Torneiras</option>
-                    <option value="Elétrica & Iluminação">Elétrica & Iluminação</option>
-                    <option value="Ferramentas & Acessórios">Ferramentas & Acessórios</option>
+                    {CATEGORY_OPTIONS.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.pathLabel}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>

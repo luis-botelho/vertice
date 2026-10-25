@@ -1,37 +1,34 @@
-import React, { useState } from 'react';
-import { QuoteItem, CustomerData, AppView } from '../types';
+import React from 'react';
+import { QuotationRecord, RepresentativeData } from '../types';
 
 interface QuotationSuccessViewProps {
-  cartItems: QuoteItem[];
-  customerData: CustomerData;
-  onNavigate: (view: AppView) => void;
+  quotation: QuotationRecord | null;
+  representativeData: RepresentativeData;
+  onStartNewQuotation: () => void;
 }
 
 export const QuotationSuccessView: React.FC<QuotationSuccessViewProps> = ({
-  cartItems,
-  customerData,
-  onNavigate,
+  quotation,
+  representativeData,
+  onStartNewQuotation,
 }) => {
-  const [downloadNotice, setDownloadNotice] = useState<string | null>(null);
+  const displayItems = quotation?.items ?? [];
+  const buyerData = quotation?.customerData;
+  const protocol = quotation?.protocol ?? 'VTC-INDISPONIVEL';
+  const representativeInitials = representativeData.nome
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((namePart) => namePart[0])
+    .join('')
+    .toUpperCase();
 
-  const handleDownloadReceipt = () => {
-    setDownloadNotice('Gerando Recibo Oficial de Cotação VTC-2025-0841.pdf...');
-    setTimeout(() => {
-      setDownloadNotice('Recibo oficial baixado com sucesso!');
-      setTimeout(() => setDownloadNotice(null), 3500);
-    }, 1200);
+  const handlePrintProtocol = () => {
+    window.print();
   };
 
   return (
     <div className="w-full bg-[#f8f9ff] min-h-screen pb-24 text-[#00162c]">
-      {/* Notice */}
-      {downloadNotice && (
-        <div className="fixed top-24 right-4 z-50 bg-[#00162c] text-white text-xs font-semibold px-4 py-3 rounded-lg shadow-xl border border-white/20 flex items-center gap-2">
-          <span className="material-symbols-outlined text-[18px] text-[#2F80ED]">download_done</span>
-          <span>{downloadNotice}</span>
-        </div>
-      )}
-
       {/* Confirmation Header Banner */}
       <div className="bg-gradient-to-r from-[#00162c] to-[#102b46] text-white py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -50,7 +47,7 @@ export const QuotationSuccessView: React.FC<QuotationSuccessViewProps> = ({
 
           <div className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20">
             <span className="text-xs text-white/70">Protocolo de Registro:</span>
-            <span className="text-sm font-mono font-bold text-white tracking-wider">#VTC-2025-0841</span>
+            <span className="text-sm font-mono font-bold text-white tracking-wider">#{protocol}</span>
           </div>
         </div>
       </div>
@@ -63,22 +60,22 @@ export const QuotationSuccessView: React.FC<QuotationSuccessViewProps> = ({
             {/* Left: Rep info */}
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-full bg-[#e5eeff] text-[#005cba] flex items-center justify-center font-bold text-lg shrink-0">
-                MA
+                {representativeInitials}
               </div>
               <div>
                 <span className="text-[10px] uppercase font-bold text-[#005cba] tracking-wider block">
                   Representante Técnico Responsável
                 </span>
-                <h3 className="font-bold text-base text-[#00162c]">Marcos Andrade</h3>
-                <p className="text-xs text-[#43474d] mt-0.5">Mesa Comercial Costa Verde (Angra, Paraty e Mangaratiba)</p>
-                <div className="flex items-center gap-3 text-xs text-[#005cba] mt-2 font-medium">
+                <h3 className="font-bold text-base text-[#00162c]">{representativeData.nome}</h3>
+                <p className="text-xs text-[#43474d] mt-0.5">{representativeData.mesaComercial}</p>
+                <div className="flex flex-wrap items-center gap-3 text-xs text-[#005cba] mt-2 font-medium">
                   <span className="flex items-center gap-1">
                     <span className="material-symbols-outlined text-[14px]">call</span>
-                    (24) 99842-8820
+                    {representativeData.telefone}
                   </span>
                   <span className="flex items-center gap-1">
                     <span className="material-symbols-outlined text-[14px]">mail</span>
-                    marcos.andrade@verticerep.com.br
+                    {representativeData.email}
                   </span>
                 </div>
               </div>
@@ -114,7 +111,7 @@ export const QuotationSuccessView: React.FC<QuotationSuccessViewProps> = ({
                   <span>1. Recebimento OK</span>
                 </div>
                 <p className="text-[11px] text-[#43474d]">
-                  CNPJ ({customerData.cnpj}) e IE validados no Sintegra RJ.
+                  CNPJ ({buyerData?.cnpj || '—'}) e IE validados no Sintegra RJ.
                 </p>
               </div>
 
@@ -147,7 +144,7 @@ export const QuotationSuccessView: React.FC<QuotationSuccessViewProps> = ({
                 Relação de Produtos Registrados
               </h4>
               <span className="text-xs text-[#43474d]">
-                Cliente: <strong>{customerData.razaoSocial}</strong>
+                Cliente: <strong>{buyerData?.razaoSocial || '—'}</strong>
               </span>
             </div>
 
@@ -162,7 +159,7 @@ export const QuotationSuccessView: React.FC<QuotationSuccessViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#f0f4fc]">
-                  {cartItems.map((item) => (
+                  {displayItems.map((item) => (
                     <tr key={item.product.id} className="hover:bg-[#f8f9ff]">
                       <td className="py-3 px-3">
                         <span className="font-mono text-[10px] text-[#43474d] block">{item.product.sku}</span>
@@ -185,30 +182,20 @@ export const QuotationSuccessView: React.FC<QuotationSuccessViewProps> = ({
           {/* Quick Actions */}
           <div className="pt-4 border-t border-[#f0f4fc] flex flex-wrap items-center justify-between gap-3">
             <button
-              onClick={() => onNavigate('catalog')}
-              className="px-4 py-2.5 rounded-lg border border-[#d2e2ff] text-xs font-semibold text-[#00162c] hover:bg-[#eff4ff] cursor-pointer flex items-center gap-1.5"
+              onClick={onStartNewQuotation}
+              className="px-5 py-2.5 rounded-lg bg-[#00162c] hover:bg-[#005cba] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
             >
-              <span className="material-symbols-outlined text-[16px]">arrow_back</span>
-              <span>Retornar ao Catálogo</span>
+              <span className="material-symbols-outlined text-[16px]">add_circle</span>
+              <span>Fazer Nova Cotação</span>
             </button>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={handleDownloadReceipt}
-                className="px-4 py-2.5 rounded-lg bg-[#eff4ff] hover:bg-[#dce9ff] text-[#00162c] text-xs font-semibold cursor-pointer flex items-center gap-1.5"
-              >
-                <span className="material-symbols-outlined text-[16px] text-[#005cba]">print</span>
-                <span>Imprimir Protocolo</span>
-              </button>
-
-              <button
-                onClick={() => onNavigate('proposal')}
-                className="px-5 py-2.5 rounded-lg bg-[#00162c] hover:bg-[#005cba] text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
-              >
-                <span className="material-symbols-outlined text-[16px]">description</span>
-                <span>Visualizar Proposta Comercial Gerada</span>
-              </button>
-            </div>
+            <button
+              onClick={handlePrintProtocol}
+              className="px-5 py-2.5 rounded-lg border border-[#d2e2ff] text-[#00162c] hover:bg-[#eff4ff] text-xs font-semibold cursor-pointer flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-[16px] text-[#005cba]">print</span>
+              <span>Imprimir Protocolo</span>
+            </button>
           </div>
         </div>
       </div>

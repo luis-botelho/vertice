@@ -1,4 +1,5 @@
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? '/api';
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+const apiBaseUrl = (configuredApiUrl || '/api').replace(/\/$/, '');
 export const AUTH_TOKEN_KEY = 'vertice_auth_token';
 
 export async function apiRequest<T>(path: string, options: RequestInit): Promise<T> {
@@ -19,7 +20,11 @@ export async function apiRequest<T>(path: string, options: RequestInit): Promise
     }
     return payload as T;
   } catch (err) {
-    // Dev fallback when API server is not running (e.g. vite dev without server)
+    if (!import.meta.env.DEV) {
+      throw err;
+    }
+
+    // Dev-only fallback when the API server is not running.
     if (path === '/quotations' && options.method === 'POST') {
       const now = new Date();
       const protocol = `VTC-DEV-${now.getFullYear()}-${String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0')}`;
@@ -27,15 +32,6 @@ export async function apiRequest<T>(path: string, options: RequestInit): Promise
     }
     if (path === '/contact' && options.method === 'POST') {
       return {request: {id: `dev-${Date.now()}`, created_at: new Date().toISOString()}} as T;
-    }
-    if (path === '/auth/login' && options.method === 'POST') {
-      try {
-        const body = options.body ? JSON.parse(options.body as string) : {};
-        if (body.email === 'demo@vertice.com.br' && body.password === 'demo123') {
-          sessionStorage.setItem(AUTH_TOKEN_KEY, 'dev-token');
-          return {accessToken: 'dev-token'} as T;
-        }
-      } catch {}
     }
     throw err;
   }

@@ -1,5 +1,5 @@
 import type {VercelRequest, VercelResponse} from '@vercel/node';
-import {allowMethods, jsonError, readString} from './_lib/http';
+import {allowMethods, applyCors, jsonError, readString} from './_lib/http';
 
 const hasSupabase =
   Boolean(process.env.SUPABASE_URL) && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -8,6 +8,10 @@ export default async function handler(
   request: VercelRequest,
   response: VercelResponse,
 ): Promise<void> {
+  if (applyCors(request, response)) {
+    return;
+  }
+
   if (!allowMethods(request, response, ['POST'])) {
     return;
   }
@@ -24,12 +28,7 @@ export default async function handler(
   }
 
   if (!hasSupabase) {
-    response.status(201).json({
-      request: {
-        id: `dev-${Date.now()}`,
-        created_at: new Date().toISOString(),
-      },
-    });
+    jsonError(response, 503, 'Serviço de contato não configurado.');
     return;
   }
 
@@ -50,11 +49,6 @@ export default async function handler(
     response.status(201).json({request: data});
   } catch (err) {
     console.error('Failed to create contact request', err);
-    response.status(201).json({
-      request: {
-        id: `dev-${Date.now()}`,
-        created_at: new Date().toISOString(),
-      },
-    });
+    jsonError(response, 500, 'Não foi possível enviar a mensagem.');
   }
 }

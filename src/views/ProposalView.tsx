@@ -1,86 +1,58 @@
 import React, { useState } from 'react';
-import { CustomerData, QuoteItem, AppView } from '../types';
+import {
+  CustomerData,
+  QuoteItem,
+  AppView,
+  RepresentativeData,
+  QuotationRecord,
+} from '../types';
+import { getItemDiscountPercent, getItemUnitPrice } from '../lib/quotations';
 
 interface ProposalViewProps {
   customerData: CustomerData;
   cartItems: QuoteItem[];
+  quotation: QuotationRecord | null;
+  representativeData: RepresentativeData;
   onNavigate: (view: AppView) => void;
 }
 
 export const ProposalView: React.FC<ProposalViewProps> = ({
   customerData,
   cartItems,
+  quotation,
+  representativeData,
   onNavigate,
 }) => {
   const [isApproved, setIsApproved] = useState(false);
   const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null);
 
-  // Default fallback items to ensure the exact matching figures from the user's mockup (R$ 3.966,28) if cart is empty or custom
-  const displayItems =
-    cartItems.length > 0
-      ? cartItems.map((item, idx) => {
-          const discountPct = item.product.standardDiscountPercent || 8.5;
-          const unitNet = item.product.tablePrice * (1 - discountPct / 100);
-          const totalNet = unitNet * item.quantity;
-          return {
-            seq: String(idx + 1).padStart(2, '0'),
-            sku: item.product.sku,
-            description: item.product.name,
-            manufacturer: item.product.manufacturer,
-            ncm: item.product.ncm || '8481.80.99',
-            unit: item.product.unit,
-            quantity: item.quantity,
-            tablePrice: item.product.tablePrice,
-            discount: discountPct,
-            netPrice: unitNet,
-            totalNet: totalNet,
-          };
-        })
-      : [
-          {
-            seq: '01',
-            sku: 'HYD-VLV-4490',
-            description: 'Kit Válvula de Descarga Universal Completa com Acabamento Cromado',
-            manufacturer: 'CENSI',
-            ncm: '8481.80.19',
-            unit: 'un',
-            quantity: 12,
-            tablePrice: 138.5,
-            discount: 8.5,
-            netPrice: 126.73,
-            totalNet: 1520.73,
-          },
-          {
-            seq: '02',
-            sku: 'MET-TOR-8821',
-            description: 'Torneira Monocomando de Bancada para Cozinha Bica Alta Tube Cromada',
-            manufacturer: 'DECA',
-            ncm: '8481.80.19',
-            unit: 'un',
-            quantity: 6,
-            tablePrice: 265.0,
-            discount: 5.0,
-            netPrice: 251.75,
-            totalNet: 1510.5,
-          },
-          {
-            seq: '03',
-            sku: 'HYD-TUB-100E',
-            description: 'Tubo PVC Esgoto Série Normal 100mm Barra 6m',
-            manufacturer: 'TIGRE',
-            ncm: '3917.23.00',
-            unit: 'barra',
-            quantity: 20,
-            tablePrice: 52.0,
-            discount: 10.0,
-            netPrice: 46.8,
-            totalNet: 936.0,
-          },
-        ];
+  const sourceCustomer = quotation?.customerData ?? customerData;
+  const sourceItems = quotation?.items ?? cartItems;
+
+  const displayItems = sourceItems.map((item, idx) => {
+    const discountPct = getItemDiscountPercent(item);
+    const unitNet = getItemUnitPrice(item);
+    const totalNet = unitNet * item.quantity;
+    return {
+      seq: String(idx + 1).padStart(2, '0'),
+      sku: item.product.sku,
+      description: item.product.name,
+      manufacturer: item.product.manufacturer,
+      ncm: item.product.ncm || '8481.80.99',
+      unit: item.product.unit,
+      quantity: item.quantity,
+      tablePrice: item.product.tablePrice,
+      discount: discountPct,
+      netPrice: unitNet,
+      totalNet: totalNet,
+    };
+  });
 
   const totalTableSum = displayItems.reduce((acc, it) => acc + it.tablePrice * it.quantity, 0);
   const totalNetSum = displayItems.reduce((acc, it) => acc + it.totalNet, 0);
   const totalDiscounts = totalTableSum - totalNetSum;
+  const proposalNumber = quotation?.protocol ?? '0001/2025';
+  const issuedAt = new Date(quotation?.createdAt ?? Date.now()).toLocaleDateString('pt-BR');
 
   const handleApprove = () => {
     setIsApproved(true);
@@ -114,11 +86,11 @@ export const ProposalView: React.FC<ProposalViewProps> = ({
       <div className="max-w-4xl mx-auto px-4 mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onNavigate('quotation-success')}
+            onClick={() => onNavigate('representative-inbox')}
             className="px-3 py-1.5 rounded-lg bg-white border border-[#d2e2ff] text-xs font-semibold text-[#00162c] hover:bg-[#eff4ff] cursor-pointer flex items-center gap-1"
           >
             <span className="material-symbols-outlined text-[16px]">arrow_back</span>
-            <span>Voltar ao Protocolo</span>
+            <span>Voltar à Mesa do Representante</span>
           </button>
           <span className="text-xs text-[#43474d]">Documento timbrado em formato oficial A4</span>
         </div>
@@ -171,20 +143,19 @@ export const ProposalView: React.FC<ProposalViewProps> = ({
                 REPRESENTAÇÕES COMERCIAIS LTDA
               </span>
               <p className="text-[11px] text-[#43474d] mt-1">
-                CNPJ: 34.819.002/0001-90 • CORE-RJ: 44.912/PJ<br />
-                Atendimento Técnico Regional: Costa Verde - RJ
+                Telefone: {representativeData.telefone} • E-mail: {representativeData.email}
               </p>
             </div>
           </div>
 
           <div className="text-right sm:text-right">
             <span className="inline-block bg-[#00162c] text-white text-xs font-bold px-3 py-1 rounded">
-              PROPOSTA COMERCIAL Nº 0001/2025
+              PROPOSTA COMERCIAL Nº {proposalNumber}
             </span>
             <div className="text-xs text-[#43474d] mt-2 space-y-0.5">
-              <div>Data de Emissão: <strong className="text-[#00162c]">24/10/2025</strong></div>
+              <div>Data de Emissão: <strong className="text-[#00162c]">{issuedAt}</strong></div>
               <div>Validade: <strong className="text-[#00162c]">07 dias úteis</strong></div>
-              <div>Representante: <strong className="text-[#00162c]">Marcos Andrade</strong></div>
+              <div>Representante: <strong className="text-[#00162c]">{representativeData.nome}</strong></div>
             </div>
           </div>
         </div>
@@ -195,11 +166,11 @@ export const ProposalView: React.FC<ProposalViewProps> = ({
             <span className="text-[10px] uppercase font-bold text-[#005cba] tracking-wider block mb-1">
               Destinatário / Empresa Faturada
             </span>
-            <h3 className="font-bold text-sm text-[#00162c]">{customerData.razaoSocial}</h3>
+            <h3 className="font-bold text-sm text-[#00162c]">{sourceCustomer.razaoSocial}</h3>
             <p className="text-[#43474d] mt-1 space-y-0.5">
-              <span>CNPJ: <strong className="text-[#00162c] font-mono">{customerData.cnpj}</strong></span><br />
-              <span>Inscrição Estadual: <strong className="text-[#00162c] font-mono">{customerData.inscricaoEstadual}</strong></span><br />
-              <span>Endereço: {customerData.endereco || 'Rod. Rio-Santos BR-101 Km 482 - Angra dos Reis - RJ'}</span>
+              <span>CNPJ: <strong className="text-[#00162c] font-mono">{sourceCustomer.cnpj}</strong></span><br />
+              <span>Inscrição Estadual: <strong className="text-[#00162c] font-mono">{sourceCustomer.inscricaoEstadual}</strong></span><br />
+              <span>Endereço: {sourceCustomer.endereco || 'Rod. Rio-Santos BR-101 Km 482 - Angra dos Reis - RJ'}</span>
             </p>
           </div>
 
@@ -210,11 +181,11 @@ export const ProposalView: React.FC<ProposalViewProps> = ({
             <div className="text-[#43474d] space-y-1">
               <div className="flex justify-between">
                 <span>Prazo de Pagamento:</span>
-                <strong className="text-[#00162c]">{customerData.prazoCompra}</strong>
+                <strong className="text-[#00162c]">{sourceCustomer.prazoCompra}</strong>
               </div>
               <div className="flex justify-between">
                 <span>Tipo de Frete:</span>
-                <strong className="text-[#00162c]">{customerData.modalidadeFrete}</strong>
+                <strong className="text-[#00162c]">{sourceCustomer.modalidadeFrete}</strong>
               </div>
               <div className="flex justify-between">
                 <span>Prazo de Expedição Fábrica:</span>
@@ -222,7 +193,7 @@ export const ProposalView: React.FC<ProposalViewProps> = ({
               </div>
               <div className="flex justify-between">
                 <span>Comprador de Contato:</span>
-                <strong className="text-[#00162c]">{customerData.compradorNome} ({customerData.whatsapp})</strong>
+                <strong className="text-[#00162c]">{sourceCustomer.compradorNome} ({sourceCustomer.whatsapp})</strong>
               </div>
             </div>
           </div>
@@ -262,7 +233,8 @@ export const ProposalView: React.FC<ProposalViewProps> = ({
                       R$ {item.tablePrice.toFixed(2).replace('.', ',')}
                     </td>
                     <td className="py-3 px-3 text-center font-bold text-[#005cba]">
-                      -{item.discount}%
+                      {item.discount >= 0 ? '-' : '+'}
+                      {Math.abs(item.discount).toFixed(1)}%
                     </td>
                     <td className="py-3 px-3 text-right font-semibold text-[#00162c]">
                       R$ {item.netPrice.toFixed(2).replace('.', ',')}
@@ -272,6 +244,13 @@ export const ProposalView: React.FC<ProposalViewProps> = ({
                     </td>
                   </tr>
                 ))}
+                {displayItems.length === 0 && (
+                  <tr>
+                    <td colSpan={9} className="py-6 px-3 text-center text-[#43474d]">
+                      Nenhum item registrado nesta cotação.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
